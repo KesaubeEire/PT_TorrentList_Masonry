@@ -5,11 +5,12 @@
 // @version      0.1
 // @description  KamePT torrent page waterfall view
 // @author       Kesa
-// @match        https://kamept.com/torrents.php
+// @match        https://kamept.com/torrents.php*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=kamept.com
 // @grant        none
 // ==/UserScript==
 
+const domain = "https://kamept.com/";
 (function () {
   "use strict";
 
@@ -47,7 +48,7 @@
   const btnViewOrigin = document.getElementById("btnViewOrigin");
   // 创建一个按钮元素
   const toggleBtn = document.createElement("button");
-  toggleBtn.innerText = "显示隐藏原种子表格";
+  toggleBtn.innerText = "显示原种子表格";
   toggleBtn.style.position = "fixed";
   toggleBtn.style.top = "10px";
   toggleBtn.style.right = "10px";
@@ -61,8 +62,10 @@
   toggleBtn.addEventListener("click", function () {
     if (tableNode.style.display === "none") {
       tableNode.style.display = "block";
+      toggleBtn.innerText = "隐藏原种子表格";
     } else {
       tableNode.style.display = "none";
+      toggleBtn.innerText = "显示原种子表格";
     }
   });
   // 将按钮插入到文档中
@@ -102,8 +105,31 @@
       ? torrentNameLink.textContent.trim()
       : "";
 
-    // 获取图片链接
-    const picLink = torrentNameLink.querySelector("img").src.trim();
+    // 获取种子详情链接
+    const torrentLink = torrentNameLink.href;
+    // console.log(torrentLink);
+
+    // 获取种子id
+    const pattern = /id=(\d+)&hit/;
+    const match = torrentLink.match(pattern);
+    const torrentId = match ? parseInt(match[1]) : null;
+
+    // 获取预览图片链接
+    let picLink = row
+      .querySelector(".torrentname img")
+      .getAttribute("data-src");
+    // -- 没有加域名前缀的加上
+    if (!picLink.includes("http")) picLink = domain + picLink;
+
+    // 获取置顶信息
+    const place_at_the_top = row.querySelector(".torrentname img.sticky");
+    const pattMsg = place_at_the_top ? place_at_the_top.title : "";
+
+    // 获取下载链接
+    const downloadLink = `${domain}download.php?id=${torrentId}`;
+
+    // 获取收藏链接
+    const collectLink = `javascript: bookmark(${torrentId},0);`;
 
     // 获取免费折扣类型
     const freeTypeImg = row.querySelector('img[class^="pro_"]');
@@ -142,13 +168,13 @@
     dom01 = descriptionCell;
     const str = descriptionCell.innerHTML;
     let desResult;
-    // 前处理
+    // -- 前处理
     if (str.lastIndexOf("</span>") > str.lastIndexOf("<br>")) {
       desResult = str.substring(str.lastIndexOf("</span>") + 7); // 加 7 是为了去掉 "</span>" 的长度
     } else {
       desResult = str.substring(str.lastIndexOf("<br>") + 4); // 加 7 是为了去掉 "</span>" 的长度
     }
-    // 后处理
+    // -- 后处理
     desResult = desResult.split("<div")[0];
     const description = desResult ? desResult.trim() : "";
 
@@ -181,7 +207,12 @@
     const rowData = {
       category,
       torrent_name: torrentName,
+      torrentLink,
+      torrentId,
       picLink,
+      pattMsg,
+      downloadLink,
+      collectLink,
       free_type: freeType,
       free_remaining_time: freeRemainingTime,
       tags,
