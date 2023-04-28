@@ -6,7 +6,7 @@
 // @description  KamePT torrent page waterfall view
 // @author       Kesa
 // @match        https://kamept.com/torrents.php*
-// @icon         https://www.google.com/s2/favicons?sz=64&domain=kamept.com
+// @icon         https://kamept.com/favicon.ico
 // @grant        none
 // ==/UserScript==
 
