@@ -10,10 +10,15 @@
 // @grant        none
 // ==/UserScript==
 
+// kame 域名
 const domain = "https://kamept.com/";
+
+// 瀑布流对象
+var masonry;
+
 (function () {
   "use strict";
-
+  // FIXME:
   // 1. 隐藏原种子列表并进行前置操作 --------------------------------------------------------------------------------------
   // 表格节点
   const tableNode = document.querySelector("table.torrents");
@@ -28,36 +33,29 @@ const domain = "https://kamept.com/";
   tableNode.style.display = "none";
 
   // 放置瀑布流的节点
-  const fallNode = document.createElement("div");
+  const waterfallNode = document.createElement("div");
 
   // 添加class
-  fallNode.classList.add("waterfall");
+  waterfallNode.classList.add("waterfall");
 
   // 设置样式
-  fallNode.style.width = "100%";
-  fallNode.style.paddingTop = "20px";
-  fallNode.style.paddingBottom = "20px";
-  fallNode.style.backgroundColor = "grey";
-  fallNode.style.borderRadius = "20px";
-  fallNode.style.height = "100%";
+  // waterfallNode.style.width = "100%";
+  // waterfallNode.style.paddingTop = "20px";
+  // waterfallNode.style.paddingBottom = "20px";
+  // waterfallNode.style.backgroundColor = "grey";
+  // waterfallNode.style.borderRadius = "20px";
+  // waterfallNode.style.height = "100%";
 
   // 将瀑布流节点放置在表格节点上面
-  parentNode.insertBefore(fallNode, tableNode);
+  parentNode.insertBefore(waterfallNode, tableNode);
 
   // 生成按钮 -> 可以随时显示原来的表格
   const btnViewOrigin = document.getElementById("btnViewOrigin");
   // 创建一个按钮元素
   const toggleBtn = document.createElement("button");
+  toggleBtn.setAttribute("id", "toggle_oldTable");
   toggleBtn.innerText = "显示原种子表格";
-  toggleBtn.style.position = "fixed";
-  toggleBtn.style.top = "10px";
-  toggleBtn.style.right = "10px";
-  toggleBtn.style.padding = "10px";
-  toggleBtn.style.backgroundColor = "#333";
-  toggleBtn.style.color = "#fff";
-  toggleBtn.style.border = "none";
-  toggleBtn.style.borderRadius = "5px";
-  toggleBtn.style.cursor = "pointer";
+
   // 为按钮添加事件监听器
   toggleBtn.addEventListener("click", function () {
     if (tableNode.style.display === "none") {
@@ -71,6 +69,7 @@ const domain = "https://kamept.com/";
   // 将按钮插入到文档中
   document.body.appendChild(toggleBtn);
 
+  // FIXME:
   // 2. 将种子列表信息搞下来 html -> json 对象 --------------------------------------------------------------------------------------
   // 获取表格 Dom
   const table = document.querySelector("table.torrents");
@@ -97,7 +96,7 @@ const domain = "https://kamept.com/";
     if (!category) return;
 
     // 加index
-    index++;
+    const torrentIndex = index++;
 
     // 获取种子名称
     const torrentNameLink = row.querySelector(".torrentname a");
@@ -205,6 +204,7 @@ const domain = "https://kamept.com/";
 
     // 将当前行的数据格式化为 JSON 对象
     const rowData = {
+      torrentIndex,
       category,
       torrent_name: torrentName,
       torrentLink,
@@ -233,10 +233,12 @@ const domain = "https://kamept.com/";
   // console.log(JSON.stringify(data));
   console.log(data);
 
-  // 3. 开整瀑布流
+  // FIXME:
+  // 3. 开整瀑布流 --------------------------------------------------------------------------------------
   // -- 3.1 搞定卡片模板
   const cardTemplate = (data) => {
     const {
+      torrentIndex,
       category,
       torrent_name: torrentName,
       torrentLink,
@@ -259,28 +261,32 @@ const domain = "https://kamept.com/";
 
     return `
       <div class="card">
+        
         <div class="card-header">
           <a src="${torrentLink}">${torrentName}</a>
         </div>
         <div class="card-body">
           <div class="card-image">
             <img src="${picLink}" alt="${torrentName}" />
+            <div class="card-index">
+              ${torrentIndex}
+            </div>  
           </div>
           <div class="card-details">
-            <ul>
-              <li><strong>Category:</strong> ${category}</li>
-              <!--<li><strong>Torrent ID:</strong> ${torrentId}</li> -->
-              <li><strong>Tags:</strong> ${tags.join(", ")}</li>
-              <li><strong>Description:</strong> ${description}</li>
-              <li><strong>Comments:</strong> ${comments}</li>
-              <li><strong>Uploaded:</strong> ${uploadDate}</li>
-              <li><strong>Size:</strong> ${size}</li>
-              <li><strong>Seeders:</strong> ${seeders}</li>
-              <li><strong>Leechers:</strong> ${leechers}</li>
-              <li><strong>Snatched:</strong> ${snatched}</li>
-              <li><strong>Download Link:</strong> <a src="${downloadLink}">下载</a></li>
-              <li><strong>Collect Link:</strong> <a href="${collectLink}">Collect</a></li>
-            </ul>
+            <div class="card-line"><strong>Category:</strong> ${category}</div>
+            <!--<div class="card-line"><strong>Torrent ID:</strong> ${torrentId}</div> -->
+            <div class="card-line">
+              <strong>Tags:</strong> ${tags.join(", ")}
+            </div>
+            <div class="card-line"><strong>Description:</strong> ${description}</div>
+            <div class="card-line"><strong>Comments:</strong> ${comments}</div>
+            <div class="card-line"><strong>Uploaded:</strong> ${uploadDate}</div>
+            <div class="card-line"><strong>Size:</strong> ${size}</div>
+            <div class="card-line"><strong>Seeders:</strong> ${seeders}</div>
+            <div class="card-line"><strong>Leechers:</strong> ${leechers}</div>
+            <div class="card-line"><strong>Snatched:</strong> ${snatched}</div>
+            <div class="card-line"><strong>Download Link:</strong> <a src="${downloadLink}">下载</a></div>
+            <div class="card-line"><strong>Collect Link:</strong> <a href="${collectLink}">Collect</a></div>
           </div>
         </div>
         <div class="card-footer">
@@ -295,38 +301,106 @@ const domain = "https://kamept.com/";
   for (const rowData of data) {
     const card = document.createElement("div");
     card.innerHTML = cardTemplate(rowData);
-    fallNode.appendChild(card);
+    waterfallNode.appendChild(card);
   }
 
   // -- 3.2 调整 css
+  // 使用中的css
   const css = `
 
+/* 瀑布流主容器 */
 div.waterfall{
-  display: flex;
-  flex-warp: wrap;
+  width: 100%;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  background-color: grey;
+  border-radius: 20px;
+  height: 100%;
 }
 
+/* 悬浮按键1: 显示隐藏原种子列表 */
+button#toggle_oldTable {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  padding: 10px;
+  background-color: #333;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}  
+
+/* 卡片 */
 .card {
   width: 200px;
   border: 1px solid #ccc;
   border-radius: 5px;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
-  margin: 10px;
-  overflow: hidden;
+  margin: 10px; 
 }
 
+/* 卡片图像div */
 .card-image {
   height: 100%;
   position: relative;
+
+  position: relative;
 }
 
+/* 卡片图像div -> img标签 */
 .card-image img {
   width: 100%;
   object-fit: cover;
 }
+
+/* 卡片索引 */
+.card-index{
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 0;
+  margin: 0;
+  height: 20px;
+  width: 100%;
+  line-height: 16px;
+  font-size: 16px;
+}
+`;
+
+  // 注释中的css
+  const css_commented = `
+
 `;
 
   const style = document.createElement("style");
   style.textContent = css;
   document.head.appendChild(style);
+
+  // 创建script标签
+  var script = document.createElement("script");
+  // 设置script标签的src属性为Masonry库的地址
+  script.src =
+    "https://cdnjs.cloudflare.com/ajax/libs/masonry/4.2.2/masonry.pkgd.min.js";
+  // 将script标签添加到head标签中
+  document.getElementsByTagName("head")[0].appendChild(script);
+
+  script.onload = function () {
+    var container = document.querySelector("div.waterfall");
+    // 初始化瀑布流布局
+    masonry = new Masonry(container, {
+      itemSelector: ".card",
+      columnWidth: ".card",
+      gutter: 2,
+    });
+    // console.log(masonry);
+  };
+
+  // FIXME:
+  // 4. 底部检测 & 加载下一页 --------------------------------------------------------------------------------------
+  // -- 4.1 检测是否到了底部
+  // -- 4.2 加载下一页
+  //    -- 4.2.1 获取下一页的链接
+  //    -- 4.2.2 加载下一页 html 获取 json 信息对象
+  //    -- 4.2.2 渲染 下一页信息 并 加到 waterfallNode 里面来
 })();
