@@ -39,7 +39,7 @@ const domain = "https://kamept.com/";
   fallNode.style.paddingBottom = "20px";
   fallNode.style.backgroundColor = "grey";
   fallNode.style.borderRadius = "20px";
-  fallNode.style.height = "200px";
+  fallNode.style.height = "100%";
 
   // 将瀑布流节点放置在表格节点上面
   parentNode.insertBefore(fallNode, tableNode);
@@ -232,4 +232,101 @@ const domain = "https://kamept.com/";
   // 将所有行的 JSON 对象数组打印到控制台
   // console.log(JSON.stringify(data));
   console.log(data);
+
+  // 3. 开整瀑布流
+  // -- 3.1 搞定卡片模板
+  const cardTemplate = (data) => {
+    const {
+      category,
+      torrent_name: torrentName,
+      torrentLink,
+      torrentId,
+      picLink,
+      pattMsg,
+      downloadLink,
+      collectLink,
+      free_type: freeType,
+      free_remaining_time: freeRemainingTime,
+      tags,
+      description,
+      comments,
+      upload_date: uploadDate,
+      size,
+      seeders,
+      leechers,
+      snatched,
+    } = data;
+
+    return `
+      <div class="card">
+        <div class="card-header">
+          <a src="${torrentLink}">${torrentName}</a>
+        </div>
+        <div class="card-body">
+          <div class="card-image">
+            <img src="${picLink}" alt="${torrentName}" />
+          </div>
+          <div class="card-details">
+            <ul>
+              <li><strong>Category:</strong> ${category}</li>
+              <!--<li><strong>Torrent ID:</strong> ${torrentId}</li> -->
+              <li><strong>Tags:</strong> ${tags.join(", ")}</li>
+              <li><strong>Description:</strong> ${description}</li>
+              <li><strong>Comments:</strong> ${comments}</li>
+              <li><strong>Uploaded:</strong> ${uploadDate}</li>
+              <li><strong>Size:</strong> ${size}</li>
+              <li><strong>Seeders:</strong> ${seeders}</li>
+              <li><strong>Leechers:</strong> ${leechers}</li>
+              <li><strong>Snatched:</strong> ${snatched}</li>
+              <li><strong>Download Link:</strong> <a src="${downloadLink}">下载</a></li>
+              <li><strong>Collect Link:</strong> <a href="${collectLink}">Collect</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="card-footer">
+          <div><strong>Free Type:</strong> ${freeType}</div>
+          <div><strong>Free Remaining Time:</strong> ${freeRemainingTime}</div>
+          <div><strong>Patt Msg:</strong> ${pattMsg}</div>
+        </div>
+      </div>
+    `;
+  };
+
+  for (const rowData of data) {
+    const card = document.createElement("div");
+    card.innerHTML = cardTemplate(rowData);
+    fallNode.appendChild(card);
+  }
+
+  // -- 3.2 调整 css
+  const css = `
+
+div.waterfall{
+  display: flex;
+  flex-warp: wrap;
+}
+
+.card {
+  width: 200px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+  margin: 10px;
+  overflow: hidden;
+}
+
+.card-image {
+  height: 100%;
+  position: relative;
+}
+
+.card-image img {
+  width: 100%;
+  object-fit: cover;
+}
+`;
+
+  const style = document.createElement("style");
+  style.textContent = css;
+  document.head.appendChild(style);
 })();
