@@ -15,6 +15,9 @@ const domain = "https://kamept.com/";
 
 // 瀑布流对象
 var masonry;
+// window.masonry = masonry;
+
+// window.gutter = 20;
 
 (function () {
   "use strict";
@@ -53,6 +56,7 @@ var masonry;
   const btnViewOrigin = document.getElementById("btnViewOrigin");
   // 创建一个按钮元素
   const toggleBtn = document.createElement("button");
+  toggleBtn.classList.add("debug");
   toggleBtn.setAttribute("id", "toggle_oldTable");
   toggleBtn.innerText = "显示原种子表格";
 
@@ -68,6 +72,23 @@ var masonry;
   });
   // 将按钮插入到文档中
   document.body.appendChild(toggleBtn);
+
+  // 生成按钮 -> Masonry 重新排列
+  const btnReLayout = document.getElementById("btnReLayout");
+  // 创建一个按钮元素
+  const reLayoutBtn = document.createElement("button");
+  reLayoutBtn.classList.add("debug");
+  reLayoutBtn.setAttribute("id", "btnReLayout");
+  reLayoutBtn.innerText = "Masonry 重新排列";
+
+  // 为按钮添加事件监听器
+  reLayoutBtn.addEventListener("click", function () {
+    if (masonry) {
+      masonry.layout();
+    }
+  });
+  // 将按钮插入到文档中
+  document.body.appendChild(reLayoutBtn);
 
   // FIXME:
   // 2. 将种子列表信息搞下来 html -> json 对象 --------------------------------------------------------------------------------------
@@ -267,9 +288,9 @@ var masonry;
         </div>
         <div class="card-body">
           <div class="card-image">
-            <img src="${picLink}" alt="${torrentName}" />
+            <img class="card-image--img" src="${picLink}" alt="${torrentName}" />
             <div class="card-index">
-              ${torrentIndex}
+              ${torrentIndex + 1}
             </div>  
           </div>
           <div class="card-details">
@@ -301,6 +322,16 @@ var masonry;
   for (const rowData of data) {
     const card = document.createElement("div");
     card.innerHTML = cardTemplate(rowData);
+
+    //      -- 3.1.1 渲染完成图片后调整构图
+    const card_img = card.querySelector(".card-image--img");
+    card_img.onload = function () {
+      if (masonry) {
+        // TODO: 这里可以写个防抖优化性能
+        masonry.layout();
+      }
+    };
+
     waterfallNode.appendChild(card);
   }
 
@@ -318,17 +349,27 @@ div.waterfall{
   height: 100%;
 }
 
-/* 悬浮按键1: 显示隐藏原种子列表 */
-button#toggle_oldTable {
+/* 调试按键统一样式 */
+button.debug {
   position: fixed;
   top: 10px;
   right: 10px;
-  padding: 10px;
+  padding: 4px;
   background-color: #333;
   color: #fff;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+}  
+
+/* 调试按键1: 显示隐藏原种子列表 */
+button#toggle_oldTable {
+  top: 10px;
+}
+
+/* 调试按键2: Masonry 重新排列 */
+button#btnReLayout {
+  top: 40px;
 }  
 
 /* 卡片 */
@@ -359,12 +400,20 @@ button#toggle_oldTable {
   position: absolute;
   top: 0;
   left: 0;
-  padding: 0;
+  padding-right: 9px;
+  padding-left: 2px;
   margin: 0;
   height: 20px;
-  width: 100%;
   line-height: 16px;
   font-size: 16px;
+
+  background-color: rgba(0,0,0,0.7);
+  color: yellow;
+  border-top-right-radius: 100px;
+  border-bottom-right-radius: 100px;
+
+  display: flex;
+  align-items: center;
 }
 `;
 
@@ -391,9 +440,10 @@ button#toggle_oldTable {
     masonry = new Masonry(container, {
       itemSelector: ".card",
       columnWidth: ".card",
-      gutter: 2,
+      gutter: window.gutter,
     });
     // console.log(masonry);
+    window.masonry = masonry;
   };
 
   // FIXME:
