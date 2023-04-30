@@ -22,24 +22,31 @@ var masonry;
 /** 瀑布流卡片宽度 */
 const CARD_WIDTH = 200;
 
-/** 翻页: 底部检测时间间隔 */
-const PAGING_GAP = 900;
-
-/** 翻页: 底部检测视点与底部距离 */
-const PAGING_DISTANCE = 300;
+/** 瀑布流卡片索引 */
+let CARD_INDEX = 0;
 
 /** 翻页相关参数顶层对象 */
 const PAGE = {
   /** 翻页: 底部检测时间间隔 */
   GAP: 900,
+
   /** 翻页: 底部检测视点与底部距离 */
   DISTANCE: 300,
+
+  /** 翻页: 是否为初始跳转页面 */
+  IS_ORIGIN: true,
+
+  /** 翻页: 当前页数 */
+  PAGE_CURRENT: 0,
+
+  /** 翻页: 下一页数 */
+  PAGE_NEXT: 0,
+
   /** 翻页: 下一页的链接 */
   NEXT_URL: "",
 };
 
 // |-- 0.1 顶层方法
-
 /**
  * 将 种子列表dom 的信息变为 json对象列表
  * @param {DOM} torrent_list_Dom 种子列表dom
@@ -54,7 +61,7 @@ function TORRENT_LIST_TO_JSON(torrent_list_Dom) {
   const data = [];
 
   // index
-  let index = 0;
+  // let index = 0;
 
   // 遍历每一行并提取数据
   rows.forEach((row) => {
@@ -65,7 +72,7 @@ function TORRENT_LIST_TO_JSON(torrent_list_Dom) {
     if (!category) return;
 
     // 加index
-    const torrentIndex = index++;
+    const torrentIndex = CARD_INDEX++;
 
     // 获取种子名称
     const torrentNameLink = row.querySelector(".torrentname a");
@@ -201,6 +208,125 @@ function TORRENT_LIST_TO_JSON(torrent_list_Dom) {
 }
 
 /**
+ * 将种子列表信息渲染为卡片放入瀑布流
+ * @param {DOM} waterfallNode 瀑布流容器dom
+ * @param {list} torrent_json 种子列表信息的 json对象列表
+ * @param {boolean} isFirst 是否是第一次渲染, 默认为是, 新增渲染要写 false
+ */
+function RENDER_TORRENT_JSON_IN_MASONRY(
+  waterfallNode,
+  torrent_json,
+  isFirst = true
+) {
+  const cardTemplate = (data) => {
+    const {
+      torrentIndex,
+      category,
+      torrent_name: torrentName,
+      torrentLink,
+      torrentId,
+      picLink,
+      pattMsg,
+      downloadLink,
+      collectLink,
+      free_type: freeType,
+      free_remaining_time: freeRemainingTime,
+      tags,
+      description,
+      comments,
+      upload_date: uploadDate,
+      size,
+      seeders,
+      leechers,
+      snatched,
+    } = data;
+
+    return `
+<div class="card-header">
+  <a src="${torrentLink}" href="${torrentLink}" target="_blank">${torrentName}</a>
+</div>
+<div class="card-body">
+  <div class="card-image">
+    <img class="card-image--img" src="${picLink}" alt="${torrentName}" />
+    <div class="card-index">
+      ${torrentIndex + 1}
+    </div>  
+  </div>
+  <div class="card-details">
+    <div class="card-line"><strong>Category:</strong> ${category}</div>
+    <!--<div class="card-line"><strong>Torrent ID:</strong> ${torrentId}</div> -->
+    <div class="card-line">
+      <strong>Tags:</strong> ${tags.join(", ")}
+    </div>
+    <div class="card-line"><strong>Description:</strong> ${description}</div>
+    <div class="card-line"><strong>Comments:</strong> ${comments}</div>
+    <div class="card-line"><strong>Uploaded:</strong> ${uploadDate}</div>
+    <div class="card-line"><strong>Size:</strong> ${size}</div>
+    <div class="card-line"><strong>Seeders:</strong> ${seeders}</div>
+    <div class="card-line"><strong>Leechers:</strong> ${leechers}</div>
+    <div class="card-line"><strong>Snatched:</strong> ${snatched}</div>
+    <div class="card-line"><strong>Download Link:</strong> <a src="${downloadLink}">下载</a></div>
+    <div class="card-line"><strong>Collect Link:</strong> <a href="${collectLink}">Collect</a></div>
+  </div>
+</div>
+<div class="card-footer">
+  <div><strong>Free Type:</strong> ${freeType}</div>
+  <div><strong>Free Remaining Time:</strong> ${freeRemainingTime}</div>
+  <div><strong>Patt Msg:</strong> ${pattMsg}</div>
+</div>
+    `;
+  };
+
+  for (const rowData of torrent_json) {
+    const card = document.createElement("div");
+    card.classList.add("card");
+    card.innerHTML = cardTemplate(rowData);
+
+    //  |--|-- 3.1.1 渲染完成图片后调整构图
+    const card_img = card.querySelector(".card-image--img");
+    card_img.onload = function () {
+      if (masonry) {
+        // TODO: 这里可以写个防抖优化性能
+        masonry.layout();
+      }
+    };
+
+    //  |--|-- 3.1.2 插入生成的元素
+    //  |--|--|-- 3.1.2.1 第一次默认生成
+    waterfallNode.appendChild(card);
+
+    //  |--|--|-- 3.1.2.2 非第一次生成
+    if (!isFirst) {
+      // console.log("not first ----------------------------");
+      // console.log(card);
+      masonry.appended(card);
+    }
+  }
+}
+
+/**
+ * 整合上面两个函数: 将种子列表转为瀑布流
+ * @param {DOM} torrent_list_Dom 种子列表dom
+ * @param {DOM} waterfallNode 瀑布流容器dom
+ * @param {boolean} isFirst 是否是第一次渲染, 默认为是, 新增渲染要写 false
+ */
+function PUT_TORRENT_INTO_MASONRY(
+  torrent_list_Dom,
+  waterfallNode,
+  isFirst = true
+) {
+  /** 种子列表信息的 json对象列表 */
+  const data = TORRENT_LIST_TO_JSON(torrent_list_Dom);
+
+  // DEBUG:打印获得的数据
+  console.log(`渲染行数: ${data.length}`);
+  console.log(data);
+
+  // 将种子列表信息渲染为卡片放入瀑布流
+  RENDER_TORRENT_JSON_IN_MASONRY(waterfallNode, data, isFirst);
+}
+
+/**
  * 调整卡片间隔 gutter
  * @param {DOM} containerDom 容器dom
  * @param {number} card_width 卡片宽度
@@ -304,89 +430,18 @@ function debounce(func, delay) {
   // 获取表格 Dom
   const table = document.querySelector("table.torrents");
 
-  const data = TORRENT_LIST_TO_JSON(table);
+  // /** 种子列表信息的 json对象列表 */
+  // const data = TORRENT_LIST_TO_JSON(table);
 
-  // DEBUG:打印获得的数据
-  // console.log(data);
+  // // FIXME:
+  // // 3. 开整瀑布流 --------------------------------------------------------------------------------------
+  // // -- 3.1 搞定卡片模板
+  // // 将种子列表信息渲染为卡片放入瀑布流
+  // RENDER_TORRENT_JSON_IN_MASONRY(waterfallNode, data);
 
-  // FIXME:
-  // 3. 开整瀑布流 --------------------------------------------------------------------------------------
-  // -- 3.1 搞定卡片模板
-  const cardTemplate = (data) => {
-    const {
-      torrentIndex,
-      category,
-      torrent_name: torrentName,
-      torrentLink,
-      torrentId,
-      picLink,
-      pattMsg,
-      downloadLink,
-      collectLink,
-      free_type: freeType,
-      free_remaining_time: freeRemainingTime,
-      tags,
-      description,
-      comments,
-      upload_date: uploadDate,
-      size,
-      seeders,
-      leechers,
-      snatched,
-    } = data;
-
-    return `
-<div class="card-header">
-  <a src="${torrentLink}" href="${torrentLink}" target="_blank">${torrentName}</a>
-</div>
-<div class="card-body">
-  <div class="card-image">
-    <img class="card-image--img" src="${picLink}" alt="${torrentName}" />
-    <div class="card-index">
-      ${torrentIndex + 1}
-    </div>  
-  </div>
-  <div class="card-details">
-    <div class="card-line"><strong>Category:</strong> ${category}</div>
-    <!--<div class="card-line"><strong>Torrent ID:</strong> ${torrentId}</div> -->
-    <div class="card-line">
-      <strong>Tags:</strong> ${tags.join(", ")}
-    </div>
-    <div class="card-line"><strong>Description:</strong> ${description}</div>
-    <div class="card-line"><strong>Comments:</strong> ${comments}</div>
-    <div class="card-line"><strong>Uploaded:</strong> ${uploadDate}</div>
-    <div class="card-line"><strong>Size:</strong> ${size}</div>
-    <div class="card-line"><strong>Seeders:</strong> ${seeders}</div>
-    <div class="card-line"><strong>Leechers:</strong> ${leechers}</div>
-    <div class="card-line"><strong>Snatched:</strong> ${snatched}</div>
-    <div class="card-line"><strong>Download Link:</strong> <a src="${downloadLink}">下载</a></div>
-    <div class="card-line"><strong>Collect Link:</strong> <a href="${collectLink}">Collect</a></div>
-  </div>
-</div>
-<div class="card-footer">
-  <div><strong>Free Type:</strong> ${freeType}</div>
-  <div><strong>Free Remaining Time:</strong> ${freeRemainingTime}</div>
-  <div><strong>Patt Msg:</strong> ${pattMsg}</div>
-</div>
-    `;
-  };
-
-  for (const rowData of data) {
-    const card = document.createElement("div");
-    card.classList.add("card");
-    card.innerHTML = cardTemplate(rowData);
-
-    //      -- 3.1.1 渲染完成图片后调整构图
-    const card_img = card.querySelector(".card-image--img");
-    card_img.onload = function () {
-      if (masonry) {
-        // TODO: 这里可以写个防抖优化性能
-        masonry.layout();
-      }
-    };
-
-    waterfallNode.appendChild(card);
-  }
+  // -----------
+  // 一步到位整合上面步骤: 将种子列表转为瀑布流
+  PUT_TORRENT_INTO_MASONRY(table, waterfallNode);
 
   // -- 3.2 调整 css
   // 使用中的css
@@ -523,6 +578,7 @@ button#btnReLayout {
   // FIXME:
   // 4. 底部检测 & 加载下一页 --------------------------------------------------------------------------------------
   // |-- 4.1 检测是否到了底部
+
   /** 延迟加载事件变量名 */
   let debounceLoad;
 
@@ -538,24 +594,29 @@ button#btnReLayout {
 
   // |-- 4.2 加载下一页
   debounceLoad = debounce(function () {
+    console.log("到页面底部啦!!! Scrolled to bottom!");
     // |--|-- 4.2.1 获取下一页的链接
     // 使用 URLSearchParams 对象获取当前网页的查询参数
     const urlSearchParams = new URLSearchParams(window.location.search);
 
-    // 获取名为 "page" 的参数的值
-    let pageParam = urlSearchParams.get("page");
+    // 获取名为 "page" 的参数的值 -> 初始为页面值, 更新为更新值
+    PAGE.PAGE_CURRENT = PAGE.IS_ORIGIN
+      ? urlSearchParams.get("page")
+      : PAGE.PAGE_NEXT;
 
     // 如果 "page" 参数不存在，则将页数设为 0，否则打印当前页数
-    if (!pageParam) {
-      console.log(`网页链接没有page参数, 无法跳转下一页, 生成pageParam为0`);
-      pageParam = 0;
+    if (!PAGE.PAGE_CURRENT) {
+      console.log(
+        `网页链接没有page参数, 无法跳转下一页, 生成PAGE.PAGE_CURRENT为0`
+      );
+      PAGE.PAGE_CURRENT = 0;
     } else {
-      console.log("当前页数: " + pageParam);
+      console.log("当前页数: " + PAGE.PAGE_CURRENT);
     }
 
     // 将页数加 1，并设置为新的 "page" 参数的值
-    const nextPageParam = parseInt(pageParam) + 1;
-    urlSearchParams.set("page", nextPageParam);
+    PAGE.PAGE_NEXT = parseInt(PAGE.PAGE_CURRENT) + 1;
+    urlSearchParams.set("page", PAGE.PAGE_NEXT);
 
     // 生成新的链接，包括原网页的域名、路径和新的查询参数
     PAGE.NEXT_URL =
@@ -567,6 +628,8 @@ button#btnReLayout {
     // 打印新的链接
     console.log("New URL:", PAGE.NEXT_URL);
 
+    // TODO: 搞个 list 放入所有生成的新链接, 如果新链接存在就不 fetch 新数据
+
     // |--|-- 4.2.2 加载下一页 html 获取 json 信息对象
     fetch(PAGE.NEXT_URL)
       .then((response) => response.text())
@@ -574,11 +637,14 @@ button#btnReLayout {
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, "text/html");
         const table = doc.querySelector("table.torrents");
-        console.log(table);
+        // console.log(table);
+
+        // 页数更新
+        PAGE.IS_ORIGIN = false;
+
+        // |--|-- 4.2.3 渲染 下一页信息 并 加到 waterfallNode 里面来
+        PUT_TORRENT_INTO_MASONRY(table, waterfallNode, false);
       })
       .catch((error) => console.error(error));
-
-    // |--|-- 4.2.2 渲染 下一页信息 并 加到 waterfallNode 里面来
-    console.log("Scrolled to bottom!");
   }, PAGE.DISTANCE);
 })();
