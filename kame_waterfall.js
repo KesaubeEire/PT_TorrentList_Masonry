@@ -10,14 +10,40 @@
 // @grant        none
 // ==/UserScript==
 
-// kame 域名
+// FIXME:
+// 0. 一些顶层设计 --------------------------------------------------------------------------------------
+// |-- 0.1 顶层参数&对象
+/** kame 域名 */
 const domain = "https://kamept.com/";
 
-// 瀑布流对象
+/** 瀑布流对象 */
 var masonry;
-// window.masonry = masonry;
 
-// window.gutter = 20;
+/** 瀑布流卡片宽度 */
+const CARD_WIDTH = 200;
+// |-- 0.1 顶层方法
+
+/**
+ * 获取瀑布流卡片间隔
+ */
+
+/**
+ * 调整卡片间隔 gutter
+ * @param {DOM} containerDom 容器dom
+ * @param {number} card_width 卡片宽度
+ */
+function GET_CARD_GUTTER(containerDom, card_width) {
+  // 获取容器宽度
+  const _width = containerDom.clientWidth;
+
+  // 获取一个合适的 gutter
+  const card_real_width = card_width + 2;
+  const columns = Math.floor(_width / card_real_width);
+  const gutter = (_width - columns * card_real_width) / (columns - 1);
+  // console.log(`列数:${columns} 间隔:${gutter}`);
+  // console.log(`容器宽:${_width} 列宽:${masonry ? masonry.columnWidth : "对象"}`);
+  return gutter;
+}
 
 (function () {
   "use strict";
@@ -281,46 +307,44 @@ var masonry;
     } = data;
 
     return `
-      <div class="card">
-        
-        <div class="card-header">
-          <a src="${torrentLink}">${torrentName}</a>
-        </div>
-        <div class="card-body">
-          <div class="card-image">
-            <img class="card-image--img" src="${picLink}" alt="${torrentName}" />
-            <div class="card-index">
-              ${torrentIndex + 1}
-            </div>  
-          </div>
-          <div class="card-details">
-            <div class="card-line"><strong>Category:</strong> ${category}</div>
-            <!--<div class="card-line"><strong>Torrent ID:</strong> ${torrentId}</div> -->
-            <div class="card-line">
-              <strong>Tags:</strong> ${tags.join(", ")}
-            </div>
-            <div class="card-line"><strong>Description:</strong> ${description}</div>
-            <div class="card-line"><strong>Comments:</strong> ${comments}</div>
-            <div class="card-line"><strong>Uploaded:</strong> ${uploadDate}</div>
-            <div class="card-line"><strong>Size:</strong> ${size}</div>
-            <div class="card-line"><strong>Seeders:</strong> ${seeders}</div>
-            <div class="card-line"><strong>Leechers:</strong> ${leechers}</div>
-            <div class="card-line"><strong>Snatched:</strong> ${snatched}</div>
-            <div class="card-line"><strong>Download Link:</strong> <a src="${downloadLink}">下载</a></div>
-            <div class="card-line"><strong>Collect Link:</strong> <a href="${collectLink}">Collect</a></div>
-          </div>
-        </div>
-        <div class="card-footer">
-          <div><strong>Free Type:</strong> ${freeType}</div>
-          <div><strong>Free Remaining Time:</strong> ${freeRemainingTime}</div>
-          <div><strong>Patt Msg:</strong> ${pattMsg}</div>
-        </div>
-      </div>
+<div class="card-header">
+  <a src="${torrentLink}" href="${torrentLink}" target="_blank">${torrentName}</a>
+</div>
+<div class="card-body">
+  <div class="card-image">
+    <img class="card-image--img" src="${picLink}" alt="${torrentName}" />
+    <div class="card-index">
+      ${torrentIndex + 1}
+    </div>  
+  </div>
+  <div class="card-details">
+    <div class="card-line"><strong>Category:</strong> ${category}</div>
+    <!--<div class="card-line"><strong>Torrent ID:</strong> ${torrentId}</div> -->
+    <div class="card-line">
+      <strong>Tags:</strong> ${tags.join(", ")}
+    </div>
+    <div class="card-line"><strong>Description:</strong> ${description}</div>
+    <div class="card-line"><strong>Comments:</strong> ${comments}</div>
+    <div class="card-line"><strong>Uploaded:</strong> ${uploadDate}</div>
+    <div class="card-line"><strong>Size:</strong> ${size}</div>
+    <div class="card-line"><strong>Seeders:</strong> ${seeders}</div>
+    <div class="card-line"><strong>Leechers:</strong> ${leechers}</div>
+    <div class="card-line"><strong>Snatched:</strong> ${snatched}</div>
+    <div class="card-line"><strong>Download Link:</strong> <a src="${downloadLink}">下载</a></div>
+    <div class="card-line"><strong>Collect Link:</strong> <a href="${collectLink}">Collect</a></div>
+  </div>
+</div>
+<div class="card-footer">
+  <div><strong>Free Type:</strong> ${freeType}</div>
+  <div><strong>Free Remaining Time:</strong> ${freeRemainingTime}</div>
+  <div><strong>Patt Msg:</strong> ${pattMsg}</div>
+</div>
     `;
   };
 
   for (const rowData of data) {
     const card = document.createElement("div");
+    card.classList.add("card");
     card.innerHTML = cardTemplate(rowData);
 
     //      -- 3.1.1 渲染完成图片后调整构图
@@ -347,6 +371,9 @@ div.waterfall{
   background-color: grey;
   border-radius: 20px;
   height: 100%;
+
+  /* margin: 0 auto; */
+  margin: 0 auto;
 }
 
 /* 调试按键统一样式 */
@@ -374,11 +401,12 @@ button#btnReLayout {
 
 /* 卡片 */
 .card {
-  width: 200px;
+  width: ${CARD_WIDTH}px;
   border: 1px solid #ccc;
   border-radius: 5px;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
-  margin: 10px; 
+  /* margin: 10px; */
+  margin: 0;
 }
 
 /* 卡片图像div */
@@ -422,6 +450,8 @@ button#btnReLayout {
 
 `;
 
+  // -- 3.3 引入 Masonry 库
+
   const style = document.createElement("style");
   style.textContent = css;
   document.head.appendChild(style);
@@ -434,15 +464,30 @@ button#btnReLayout {
   // 将script标签添加到head标签中
   document.getElementsByTagName("head")[0].appendChild(script);
 
+  //    -- 3.3.1 初始化 Masonry 参数
   script.onload = function () {
-    var container = document.querySelector("div.waterfall");
     // 初始化瀑布流布局
-    masonry = new Masonry(container, {
+    masonry = new Masonry(waterfallNode, {
       itemSelector: ".card",
       columnWidth: ".card",
-      gutter: window.gutter,
+      gutter: GET_CARD_GUTTER(waterfallNode, CARD_WIDTH),
     });
+
     // console.log(masonry);
+
+    //    -- 3.3.2 监听窗口大小变化事件
+    window.addEventListener("resize", function () {
+      // 调整卡片间隔 gutter
+      masonry.options.gutter = GET_CARD_GUTTER(waterfallNode, CARD_WIDTH);
+
+      // 重新布局瀑布流
+      masonry.layout();
+    });
+
+    // 重新布局瀑布流
+    masonry.layout();
+
+    // 绑定 Masonry 对象到 window
     window.masonry = masonry;
   };
 
