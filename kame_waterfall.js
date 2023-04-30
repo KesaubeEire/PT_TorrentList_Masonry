@@ -34,130 +34,24 @@ const PAGE = {
   GAP: 900,
   /** 翻页: 底部检测视点与底部距离 */
   DISTANCE: 300,
+  /** 翻页: 下一页的链接 */
+  NEXT_URL: "",
 };
 
 // |-- 0.1 顶层方法
-/**
- * 调整卡片间隔 gutter
- * @param {DOM} containerDom 容器dom
- * @param {number} card_width 卡片宽度
- */
-function GET_CARD_GUTTER(containerDom, card_width) {
-  // 获取容器宽度
-  const _width = containerDom.clientWidth;
-
-  // 获取一个合适的 gutter
-  const card_real_width = card_width + 2;
-  const columns = Math.floor(_width / card_real_width);
-  const gutter = (_width - columns * card_real_width) / (columns - 1);
-  // console.log(`列数:${columns} 间隔:${gutter}`);
-  // console.log(`容器宽:${_width} 列宽:${masonry ? masonry.columnWidth : "对象"}`);
-  return gutter;
-}
 
 /**
- * 防抖函数
- * @param {function} func 操作函数
- * @param {number} delay 延迟
- * @returns
+ * 将 种子列表dom 的信息变为 json对象列表
+ * @param {DOM} torrent_list_Dom 种子列表dom
+ * @returns {list} 种子列表信息的 json对象列表
  */
-function debounce(func, delay) {
-  var timer;
-  return function () {
-    var context = this;
-    var args = arguments;
-    clearTimeout(timer);
-    timer = setTimeout(function () {
-      func.apply(context, args);
-    }, delay);
-  };
-}
-
-(function () {
-  "use strict";
-  // FIXME:
-  // 1. 隐藏原种子列表并进行前置操作 --------------------------------------------------------------------------------------
-  // 表格节点
-  const tableNode = document.querySelector("table.torrents");
-
-  // 表格父节点
-  const parentNode = tableNode.parentNode;
-
-  // 删除原有视图
-  // parentNode.removeChild(tableNode);
-
-  // 隐藏原有视图
-  tableNode.style.display = "none";
-
-  // 放置瀑布流的节点
-  const waterfallNode = document.createElement("div");
-
-  // 添加class
-  waterfallNode.classList.add("waterfall");
-
-  // 设置样式
-  // waterfallNode.style.width = "100%";
-  // waterfallNode.style.paddingTop = "20px";
-  // waterfallNode.style.paddingBottom = "20px";
-  // waterfallNode.style.backgroundColor = "grey";
-  // waterfallNode.style.borderRadius = "20px";
-  // waterfallNode.style.height = "100%";
-
-  // 将瀑布流节点放置在表格节点上面
-  parentNode.insertBefore(waterfallNode, tableNode);
-
-  // 生成按钮 -> 可以随时显示原来的表格
-  const btnViewOrigin = document.getElementById("btnViewOrigin");
-  // 创建一个按钮元素
-  const toggleBtn = document.createElement("button");
-  toggleBtn.classList.add("debug");
-  toggleBtn.setAttribute("id", "toggle_oldTable");
-  toggleBtn.innerText = "显示原种子表格";
-
-  // 为按钮添加事件监听器
-  toggleBtn.addEventListener("click", function () {
-    if (tableNode.style.display === "none") {
-      tableNode.style.display = "block";
-      toggleBtn.innerText = "隐藏原种子表格";
-    } else {
-      tableNode.style.display = "none";
-      toggleBtn.innerText = "显示原种子表格";
-    }
-  });
-  // 将按钮插入到文档中
-  document.body.appendChild(toggleBtn);
-
-  // 生成按钮 -> Masonry 重新排列
-  const btnReLayout = document.getElementById("btnReLayout");
-  // 创建一个按钮元素
-  const reLayoutBtn = document.createElement("button");
-  reLayoutBtn.classList.add("debug");
-  reLayoutBtn.setAttribute("id", "btnReLayout");
-  reLayoutBtn.innerText = "Masonry 重新排列";
-
-  // 为按钮添加事件监听器
-  reLayoutBtn.addEventListener("click", function () {
-    if (masonry) {
-      masonry.layout();
-    }
-  });
-  // 将按钮插入到文档中
-  document.body.appendChild(reLayoutBtn);
-
-  // FIXME:
-  // 2. 将种子列表信息搞下来 html -> json 对象 --------------------------------------------------------------------------------------
-  // 获取表格 Dom
-  const table = document.querySelector("table.torrents");
-
+function TORRENT_LIST_TO_JSON(torrent_list_Dom) {
   // 获取表格中的所有行
-  const rows = table.querySelectorAll("tr");
+  const rows = torrent_list_Dom.querySelectorAll("tr");
   // const rows = div.querySelectorAll('tr');
 
   // 种子信息 -> 存储所有行数据的数组
   const data = [];
-
-  // 一个dom变量
-  let dom01;
 
   // index
   let index = 0;
@@ -239,7 +133,7 @@ function debounce(func, delay) {
 
     // 获取描述
     const descriptionCell = row.querySelector(".torrentname td:nth-child(2)");
-    dom01 = descriptionCell;
+
     const str = descriptionCell.innerHTML;
     let desResult;
     // -- 前处理
@@ -303,6 +197,114 @@ function debounce(func, delay) {
     // 将当前行的 JSON 对象添加到数组中
     data.push(rowData);
   });
+  return data;
+}
+
+/**
+ * 调整卡片间隔 gutter
+ * @param {DOM} containerDom 容器dom
+ * @param {number} card_width 卡片宽度
+ */
+function GET_CARD_GUTTER(containerDom, card_width) {
+  // 获取容器宽度
+  const _width = containerDom.clientWidth;
+
+  // 获取一个合适的 gutter
+  const card_real_width = card_width + 2;
+  const columns = Math.floor(_width / card_real_width);
+  const gutter = (_width - columns * card_real_width) / (columns - 1);
+  // console.log(`列数:${columns} 间隔:${gutter}`);
+  // console.log(`容器宽:${_width} 列宽:${masonry ? masonry.columnWidth : "对象"}`);
+  return gutter;
+}
+
+/**
+ * 防抖函数
+ * @param {function} func 操作函数
+ * @param {number} delay 延迟
+ * @returns
+ */
+function debounce(func, delay) {
+  var timer;
+  return function () {
+    var context = this;
+    var args = arguments;
+    clearTimeout(timer);
+    timer = setTimeout(function () {
+      func.apply(context, args);
+    }, delay);
+  };
+}
+
+(function () {
+  "use strict";
+  // FIXME:
+  // 1. 隐藏原种子列表并进行前置操作 --------------------------------------------------------------------------------------
+  // 表格节点
+  const tableNode = document.querySelector("table.torrents");
+
+  // 表格父节点
+  const parentNode = tableNode.parentNode;
+
+  // 删除原有视图
+  // parentNode.removeChild(tableNode);
+
+  // 隐藏原有视图
+  tableNode.style.display = "none";
+
+  // 放置瀑布流的节点
+  const waterfallNode = document.createElement("div");
+
+  // 添加class
+  waterfallNode.classList.add("waterfall");
+
+  // 将瀑布流节点放置在表格节点上面
+  parentNode.insertBefore(waterfallNode, tableNode);
+
+  // 生成按钮 -> 可以随时显示原来的表格
+  const btnViewOrigin = document.getElementById("btnViewOrigin");
+  // 创建一个按钮元素
+  const toggleBtn = document.createElement("button");
+  toggleBtn.classList.add("debug");
+  toggleBtn.setAttribute("id", "toggle_oldTable");
+  toggleBtn.innerText = "显示原种子表格";
+
+  // 为按钮添加事件监听器
+  toggleBtn.addEventListener("click", function () {
+    if (tableNode.style.display === "none") {
+      tableNode.style.display = "block";
+      toggleBtn.innerText = "隐藏原种子表格";
+    } else {
+      tableNode.style.display = "none";
+      toggleBtn.innerText = "显示原种子表格";
+    }
+  });
+  // 将按钮插入到文档中
+  document.body.appendChild(toggleBtn);
+
+  // 生成按钮 -> Masonry 重新排列
+  const btnReLayout = document.getElementById("btnReLayout");
+  // 创建一个按钮元素
+  const reLayoutBtn = document.createElement("button");
+  reLayoutBtn.classList.add("debug");
+  reLayoutBtn.setAttribute("id", "btnReLayout");
+  reLayoutBtn.innerText = "Masonry 重新排列";
+
+  // 为按钮添加事件监听器
+  reLayoutBtn.addEventListener("click", function () {
+    if (masonry) {
+      masonry.layout();
+    }
+  });
+  // 将按钮插入到文档中
+  document.body.appendChild(reLayoutBtn);
+
+  // FIXME:
+  // 2. 将种子列表信息搞下来 html -> json 对象 --------------------------------------------------------------------------------------
+  // 获取表格 Dom
+  const table = document.querySelector("table.torrents");
+
+  const data = TORRENT_LIST_TO_JSON(table);
 
   // DEBUG:打印获得的数据
   // console.log(data);
@@ -537,25 +539,45 @@ button#btnReLayout {
   // |-- 4.2 加载下一页
   debounceLoad = debounce(function () {
     // |--|-- 4.2.1 获取下一页的链接
+    // 使用 URLSearchParams 对象获取当前网页的查询参数
     const urlSearchParams = new URLSearchParams(window.location.search);
+
+    // 获取名为 "page" 的参数的值
     let pageParam = urlSearchParams.get("page");
+
+    // 如果 "page" 参数不存在，则将页数设为 0，否则打印当前页数
     if (!pageParam) {
-      console.log(`网页链接没有page参数, 无法跳转下一页, 生成pageParam`);
+      console.log(`网页链接没有page参数, 无法跳转下一页, 生成pageParam为0`);
       pageParam = 0;
     } else {
       console.log("当前页数: " + pageParam);
     }
 
+    // 将页数加 1，并设置为新的 "page" 参数的值
     const nextPageParam = parseInt(pageParam) + 1;
     urlSearchParams.set("page", nextPageParam);
-    const newUrl =
+
+    // 生成新的链接，包括原网页的域名、路径和新的查询参数
+    PAGE.NEXT_URL =
       window.location.origin +
       window.location.pathname +
       "?" +
       urlSearchParams.toString();
-    console.log("New URL:", newUrl);
+
+    // 打印新的链接
+    console.log("New URL:", PAGE.NEXT_URL);
 
     // |--|-- 4.2.2 加载下一页 html 获取 json 信息对象
+    fetch(PAGE.NEXT_URL)
+      .then((response) => response.text())
+      .then((html) => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
+        const table = doc.querySelector("table.torrents");
+        console.log(table);
+      })
+      .catch((error) => console.error(error));
+
     // |--|-- 4.2.2 渲染 下一页信息 并 加到 waterfallNode 里面来
     console.log("Scrolled to bottom!");
   }, PAGE.DISTANCE);
