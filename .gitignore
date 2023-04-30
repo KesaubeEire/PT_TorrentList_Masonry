@@ -4,3 +4,4 @@
 # Except this file
 !.gitignore
 !kame_waterfall.js
+!README.md
