@@ -21,12 +21,22 @@ var masonry;
 
 /** 瀑布流卡片宽度 */
 const CARD_WIDTH = 200;
+
+/** 翻页: 底部检测时间间隔 */
+const PAGING_GAP = 900;
+
+/** 翻页: 底部检测视点与底部距离 */
+const PAGING_DISTANCE = 300;
+
+/** 翻页相关参数顶层对象 */
+const PAGE = {
+  /** 翻页: 底部检测时间间隔 */
+  GAP: 900,
+  /** 翻页: 底部检测视点与底部距离 */
+  DISTANCE: 300,
+};
+
 // |-- 0.1 顶层方法
-
-/**
- * 获取瀑布流卡片间隔
- */
-
 /**
  * 调整卡片间隔 gutter
  * @param {DOM} containerDom 容器dom
@@ -43,6 +53,24 @@ function GET_CARD_GUTTER(containerDom, card_width) {
   // console.log(`列数:${columns} 间隔:${gutter}`);
   // console.log(`容器宽:${_width} 列宽:${masonry ? masonry.columnWidth : "对象"}`);
   return gutter;
+}
+
+/**
+ * 防抖函数
+ * @param {function} func 操作函数
+ * @param {number} delay 延迟
+ * @returns
+ */
+function debounce(func, delay) {
+  var timer;
+  return function () {
+    var context = this;
+    var args = arguments;
+    clearTimeout(timer);
+    timer = setTimeout(function () {
+      func.apply(context, args);
+    }, delay);
+  };
 }
 
 (function () {
@@ -276,9 +304,8 @@ function GET_CARD_GUTTER(containerDom, card_width) {
     data.push(rowData);
   });
 
-  // 将所有行的 JSON 对象数组打印到控制台
-  // console.log(JSON.stringify(data));
-  console.log(data);
+  // DEBUG:打印获得的数据
+  // console.log(data);
 
   // FIXME:
   // 3. 开整瀑布流 --------------------------------------------------------------------------------------
@@ -493,9 +520,43 @@ button#btnReLayout {
 
   // FIXME:
   // 4. 底部检测 & 加载下一页 --------------------------------------------------------------------------------------
-  // -- 4.1 检测是否到了底部
-  // -- 4.2 加载下一页
-  //    -- 4.2.1 获取下一页的链接
-  //    -- 4.2.2 加载下一页 html 获取 json 信息对象
-  //    -- 4.2.2 渲染 下一页信息 并 加到 waterfallNode 里面来
+  // |-- 4.1 检测是否到了底部
+  /** 延迟加载事件变量名 */
+  let debounceLoad;
+
+  window.addEventListener("scroll", function () {
+    const scrollHeight = document.body.scrollHeight;
+    const clientHeight = document.documentElement.clientHeight;
+    const scrollTop =
+      document.documentElement.scrollTop || document.body.scrollTop;
+    if (scrollTop + clientHeight >= scrollHeight - PAGE.DISTANCE) {
+      debounceLoad();
+    }
+  });
+
+  // |-- 4.2 加载下一页
+  debounceLoad = debounce(function () {
+    // |--|-- 4.2.1 获取下一页的链接
+    const urlSearchParams = new URLSearchParams(window.location.search);
+    let pageParam = urlSearchParams.get("page");
+    if (!pageParam) {
+      console.log(`网页链接没有page参数, 无法跳转下一页, 生成pageParam`);
+      pageParam = 0;
+    } else {
+      console.log("当前页数: " + pageParam);
+    }
+
+    const nextPageParam = parseInt(pageParam) + 1;
+    urlSearchParams.set("page", nextPageParam);
+    const newUrl =
+      window.location.origin +
+      window.location.pathname +
+      "?" +
+      urlSearchParams.toString();
+    console.log("New URL:", newUrl);
+
+    // |--|-- 4.2.2 加载下一页 html 获取 json 信息对象
+    // |--|-- 4.2.2 渲染 下一页信息 并 加到 waterfallNode 里面来
+    console.log("Scrolled to bottom!");
+  }, PAGE.DISTANCE);
 })();
