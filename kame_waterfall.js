@@ -385,7 +385,7 @@ function debounce(func, delay) {
   waterfallNode.classList.add("waterfall");
 
   // 将瀑布流节点放置在表格节点上面
-  parentNode.insertBefore(waterfallNode, tableNode);
+  parentNode.insertBefore(waterfallNode, tableNode.nextSibling);
 
   // 生成按钮 -> 可以随时显示原来的表格
   const btnViewOrigin = document.getElementById("btnViewOrigin");
@@ -457,7 +457,7 @@ div.waterfall{
   height: 100%;
 
   /* margin: 0 auto; */
-  margin: 0 auto;
+  margin: 20px auto;
 }
 
 /* 调试按键统一样式 */
@@ -490,7 +490,7 @@ button#btnReLayout {
   border-radius: 5px;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
   /* margin: 10px; */
-  margin: 0;
+  margin: 6px 0;
 }
 
 /* 卡片图像div */
