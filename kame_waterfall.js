@@ -18,9 +18,11 @@ const domain = "https://kamept.com/";
 
 /** 瀑布流对象 */
 var masonry;
+window.masonry = masonry;
 
 /** 瀑布流卡片宽度 */
-const CARD_WIDTH = 200;
+var CARD_WIDTH = 200;
+window.CARD_WIDTH = CARD_WIDTH;
 
 /** 瀑布流卡片索引 */
 let CARD_INDEX = 0;
@@ -285,10 +287,36 @@ function RENDER_TORRENT_JSON_IN_MASONRY(
     //  |--|-- 3.1.1 渲染完成图片后调整构图
     const card_img = card.querySelector(".card-image--img");
     card_img.onload = function () {
+      // 加载完图片后重新布局 Masonry
       if (masonry) {
         // TODO: 这里可以写个防抖优化性能
         masonry.layout();
       }
+
+      // // TODO:加载完图片添加鼠标触摸预览
+      // var imgEle,
+      //   selector = "img.preview",
+      //   imgPosition;
+      // jQuery("body")
+      //   .on("mouseover", selector, function (e) {
+      //     imgEle = jQuery(card_img);
+      //     // previewEle = jQuery('<img style="display: none;position:absolute;">').appendTo(imgEle.parent())
+      //     imgPosition = getImgPosition(e, imgEle);
+      //     let position = getPosition(e, imgPosition);
+      //     let src = imgEle.attr("src");
+      //     if (src) {
+      //       previewEle.attr("src", src).css(position).fadeIn("fast");
+      //     }
+      //   })
+      //   .on("mouseout", selector, function (e) {
+      //     // previewEle.remove()
+      //     // previewEle = null
+      //     previewEle.hide();
+      //   })
+      //   .on("mousemove", selector, function (e) {
+      //     let position = getPosition(e, imgPosition);
+      //     previewEle.css(position);
+      //   });
     };
 
     //  |--|-- 3.1.2 插入生成的元素
@@ -327,7 +355,7 @@ function PUT_TORRENT_INTO_MASONRY(
 }
 
 /**
- * 调整卡片间隔 gutter
+ * 根据容器宽度和卡片宽度动态调整卡片间隔 gutter
  * @param {DOM} containerDom 容器dom
  * @param {number} card_width 卡片宽度
  */
@@ -342,6 +370,26 @@ function GET_CARD_GUTTER(containerDom, card_width) {
   // console.log(`列数:${columns} 间隔:${gutter}`);
   // console.log(`容器宽:${_width} 列宽:${masonry ? masonry.columnWidth : "对象"}`);
   return gutter;
+}
+
+/**
+ * 动态调整卡片宽度
+ * @param {number} targetWidth
+ * @param {DOM} containerDom 容器dom
+ * @param {object} masonry 瀑布流对象
+ */
+function CHANGE_CARD_WIDTH(targetWidth, containerDom, masonry) {
+  // 改变卡片宽度
+  for (const card of containerDom.childNodes) {
+    console.log(window.CARD_WIDTH);
+    card.style.width = `${targetWidth}px`;
+  }
+
+  // 调整卡片间隔 gutter
+  masonry.options.gutter = GET_CARD_GUTTER(containerDom, targetWidth);
+
+  // 重新布局瀑布流
+  masonry.layout();
 }
 
 /**
@@ -421,6 +469,21 @@ function debounce(func, delay) {
     if (masonry) {
       masonry.layout();
     }
+
+    // 动态调整卡片宽度
+    CHANGE_CARD_WIDTH(window.CARD_WIDTH, waterfallNode, masonry);
+
+    // // 改变卡片宽度
+    // for (const card of waterfallNode.childNodes) {
+    //   console.log(window.CARD_WIDTH);
+    //   card.style.width = `${window.CARD_WIDTH}px`;
+    // }
+
+    // // 调整卡片间隔 gutter
+    // masonry.options.gutter = GET_CARD_GUTTER(waterfallNode, window.CARD_WIDTH);
+
+    // // 重新布局瀑布流
+    // masonry.layout();
   });
   // 将按钮插入到文档中
   document.body.appendChild(reLayoutBtn);
@@ -485,7 +548,7 @@ button#btnReLayout {
 
 /* 卡片 */
 .card {
-  width: ${CARD_WIDTH}px;
+  width: ${window.CARD_WIDTH}px;
   border: 1px solid #ccc;
   border-radius: 5px;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
@@ -554,7 +617,7 @@ button#btnReLayout {
     masonry = new Masonry(waterfallNode, {
       itemSelector: ".card",
       columnWidth: ".card",
-      gutter: GET_CARD_GUTTER(waterfallNode, CARD_WIDTH),
+      gutter: GET_CARD_GUTTER(waterfallNode, window.CARD_WIDTH),
     });
 
     // console.log(masonry);
@@ -562,7 +625,10 @@ button#btnReLayout {
     //    -- 3.3.2 监听窗口大小变化事件
     window.addEventListener("resize", function () {
       // 调整卡片间隔 gutter
-      masonry.options.gutter = GET_CARD_GUTTER(waterfallNode, CARD_WIDTH);
+      masonry.options.gutter = GET_CARD_GUTTER(
+        waterfallNode,
+        window.CARD_WIDTH
+      );
 
       // 重新布局瀑布流
       masonry.layout();
