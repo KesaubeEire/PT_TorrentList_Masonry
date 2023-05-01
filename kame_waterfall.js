@@ -2,7 +2,7 @@
 // @name            KamePT种子列表无限下拉瀑布流视图
 // @name:en         KamePT_waterfall_torrent
 // @namespace       https://github.com/KesaubeEire/PT_TorrentList_Masonry
-// @version         0.1.1
+// @version         0.1.2
 // @description     KamePT种子列表无限下拉瀑布流视图(描述不能与名称相同, 乐)
 // @description:en  KamePT torrent page waterfall view
 // @author          Kesa
@@ -671,7 +671,7 @@ button#btnReLayout {
     // 获取名为 "page" 的参数的值 -> 初始为页面值, 更新为更新值
     PAGE.PAGE_CURRENT = PAGE.IS_ORIGIN
       ? urlSearchParams.get("page")
-      : PAGE.PAGE_NEXT;
+      : PAGE.PAGE_CURRENT;
 
     // 如果 "page" 参数不存在，则将页数设为 0，否则打印当前页数
     if (!PAGE.PAGE_CURRENT) {
@@ -708,15 +708,20 @@ button#btnReLayout {
         const table = doc.querySelector("table.torrents");
         // console.log(table);
 
-        // 页数更新
-        PAGE.IS_ORIGIN = false;
-
         // |--|-- 4.2.3 渲染 下一页信息 并 加到 waterfallNode 里面来
         PUT_TORRENT_INTO_MASONRY(table, waterfallNode, false);
 
         // 生成新的时候再改一次图片宽度
         CHANGE_CARD_WIDTH(CARD_WIDTH, waterfallNode, masonry);
+
+        // 页数更新, 在上面几行更新会导致没有下一页的情况下仍然触发
+        PAGE.IS_ORIGIN = false;
+        PAGE.PAGE_CURRENT = PAGE.PAGE_NEXT;
       })
-      .catch((error) => console.error(error));
+      .catch((error) => {
+        // console.error(error);
+        console.warn("获取不到下页信息, 可能到头了");
+        console.warn(error);
+      });
   }, PAGE.DISTANCE);
 })();
