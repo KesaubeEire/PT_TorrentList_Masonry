@@ -519,7 +519,6 @@ div.waterfall{
   width: 100%;
   padding-top: 20px;
   padding-bottom: 20px;
-  background-color: grey;
   border-radius: 20px;
   height: 100%;
 
