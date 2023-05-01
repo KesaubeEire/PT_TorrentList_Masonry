@@ -710,6 +710,9 @@ button#btnReLayout {
 
         // |--|-- 4.2.3 渲染 下一页信息 并 加到 waterfallNode 里面来
         PUT_TORRENT_INTO_MASONRY(table, waterfallNode, false);
+
+        // 生成新的时候再改一次图片宽度
+        CHANGE_CARD_WIDTH(CARD_WIDTH, waterfallNode, masonry);
       })
       .catch((error) => console.error(error));
   }, PAGE.DISTANCE);
