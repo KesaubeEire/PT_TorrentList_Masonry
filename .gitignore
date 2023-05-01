@@ -1,7 +1,12 @@
 # Ignore everything in this directory
 *
+# preview/
 
 # Except this file
 !.gitignore
 !kame_waterfall.js
 !README.md
+
+!preview/
+!preview/gif_preview.gif
+preview/input.mov
