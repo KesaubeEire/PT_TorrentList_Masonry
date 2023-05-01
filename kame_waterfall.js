@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         KamePT种子列表瀑布流视图
 // @name:en      KamePT_waterfall_torrent
-// @namespace    http://tampermonkey.net/
+// @namespace    https://github.com/KesaubeEire/PT_TorrentList_Masonry
 // @version      0.1
 // @description  KamePT torrent page waterfall view
 // @author       Kesa
@@ -381,7 +381,7 @@ function GET_CARD_GUTTER(containerDom, card_width) {
 function CHANGE_CARD_WIDTH(targetWidth, containerDom, masonry) {
   // 改变卡片宽度
   for (const card of containerDom.childNodes) {
-    console.log(window.CARD_WIDTH);
+    // console.log(CARD_WIDTH);
     card.style.width = `${targetWidth}px`;
   }
 
@@ -462,7 +462,7 @@ function debounce(func, delay) {
   const reLayoutBtn = document.createElement("button");
   reLayoutBtn.classList.add("debug");
   reLayoutBtn.setAttribute("id", "btnReLayout");
-  reLayoutBtn.innerText = "Masonry 重新排列";
+  reLayoutBtn.innerText = "单列宽度切换(200/300)";
 
   // 为按钮添加事件监听器
   reLayoutBtn.addEventListener("click", function () {
@@ -471,16 +471,18 @@ function debounce(func, delay) {
     }
 
     // 动态调整卡片宽度
-    CHANGE_CARD_WIDTH(window.CARD_WIDTH, waterfallNode, masonry);
+    CARD_WIDTH = CARD_WIDTH == 200 ? 300 : 200;
+    CHANGE_CARD_WIDTH(CARD_WIDTH, waterfallNode, masonry);
+    masonry.layout();
 
     // // 改变卡片宽度
     // for (const card of waterfallNode.childNodes) {
-    //   console.log(window.CARD_WIDTH);
-    //   card.style.width = `${window.CARD_WIDTH}px`;
+    //   console.log(CARD_WIDTH);
+    //   card.style.width = `${CARD_WIDTH}px`;
     // }
 
     // // 调整卡片间隔 gutter
-    // masonry.options.gutter = GET_CARD_GUTTER(waterfallNode, window.CARD_WIDTH);
+    // masonry.options.gutter = GET_CARD_GUTTER(waterfallNode, CARD_WIDTH);
 
     // // 重新布局瀑布流
     // masonry.layout();
@@ -548,7 +550,7 @@ button#btnReLayout {
 
 /* 卡片 */
 .card {
-  width: ${window.CARD_WIDTH}px;
+  width: ${CARD_WIDTH}px;
   border: 1px solid #ccc;
   border-radius: 5px;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
@@ -617,7 +619,7 @@ button#btnReLayout {
     masonry = new Masonry(waterfallNode, {
       itemSelector: ".card",
       columnWidth: ".card",
-      gutter: GET_CARD_GUTTER(waterfallNode, window.CARD_WIDTH),
+      gutter: GET_CARD_GUTTER(waterfallNode, CARD_WIDTH),
     });
 
     // console.log(masonry);
@@ -625,10 +627,7 @@ button#btnReLayout {
     //    -- 3.3.2 监听窗口大小变化事件
     window.addEventListener("resize", function () {
       // 调整卡片间隔 gutter
-      masonry.options.gutter = GET_CARD_GUTTER(
-        waterfallNode,
-        window.CARD_WIDTH
-      );
+      masonry.options.gutter = GET_CARD_GUTTER(waterfallNode, CARD_WIDTH);
 
       // 重新布局瀑布流
       masonry.layout();
