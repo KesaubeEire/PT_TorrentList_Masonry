@@ -1,13 +1,15 @@
 // ==UserScript==
-// @name         KamePT种子列表瀑布流视图
-// @name:en      KamePT_waterfall_torrent
-// @namespace    https://github.com/KesaubeEire/PT_TorrentList_Masonry
-// @version      0.1
-// @description  KamePT torrent page waterfall view
-// @author       Kesa
-// @match        https://kamept.com/torrents.php*
-// @icon         https://kamept.com/favicon.ico
-// @grant        none
+// @name            KamePT种子列表无限下拉瀑布流视图
+// @name:en         KamePT_waterfall_torrent
+// @namespace       https://github.com/KesaubeEire/PT_TorrentList_Masonry
+// @version         0.1
+// @description     KamePT种子列表无限下拉瀑布流视图
+// @description:en  KamePT torrent page waterfall view
+// @author          Kesa
+// @match           https://kamept.com/torrents.php*
+// @icon            https://kamept.com/favicon.ico
+// @grant           none
+// @license         MIT
 // ==/UserScript==
 
 // FIXME:
