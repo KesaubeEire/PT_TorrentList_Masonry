@@ -1,6 +1,10 @@
-# 为 KamePT 打造的种子列表瀑布流视图
+# 为 KamePT(NexusPHP) 打造的种子列表瀑布流视图
+
+![gif_preview.gif](https://github.com/KesaubeEire/PT_TorrentList_Masonry/blob/main/preview/gif_preview.gif?raw=true)
 
 RT, 本油猴脚本(目前)专为 KamePT 打造, 让你顺畅划划划, 不必点翻页!
+
+<!-- ![gif_preview.gif](./preview/gif_preview.gif) -->
 
 - 功能列表
 
