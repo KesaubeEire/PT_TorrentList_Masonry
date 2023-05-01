@@ -286,6 +286,9 @@ function RENDER_TORRENT_JSON_IN_MASONRY(
     card.classList.add("card");
     card.innerHTML = cardTemplate(rowData);
 
+    // 生成新的时候再改一次图片宽度
+    card.style.width = `${CARD_WIDTH}px`;
+
     //  |--|-- 3.1.1 渲染完成图片后调整构图
     const card_img = card.querySelector(".card-image--img");
     card_img.onload = function () {
