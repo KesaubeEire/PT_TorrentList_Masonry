@@ -269,7 +269,7 @@ function RENDER_TORRENT_JSON_IN_MASONRY(
     <div class="card-line"><strong>Seeders:</strong> ${seeders}</div>
     <div class="card-line"><strong>Leechers:</strong> ${leechers}</div>
     <div class="card-line"><strong>Snatched:</strong> ${snatched}</div>
-    <div class="card-line"><strong>Download Link:</strong> <a src="${downloadLink}">下载</a></div>
+    <div class="card-line"><strong>Download Link:</strong> <a src="${downloadLink}" href="${downloadLink}">下载</a></div>
     <div class="card-line"><strong>Collect Link:</strong> <a href="${collectLink}">Collect</a></div>
   </div>
 </div>
