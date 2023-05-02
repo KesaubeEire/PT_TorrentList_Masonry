@@ -130,23 +130,21 @@ function TORRENT_LIST_TO_JSON(torrent_list_Dom) {
 
     // 获取标签
     const tagSpans = row.querySelectorAll(".torrentname span");
-    let tags = tagSpans
-      ? Array.from(tagSpans).map((span) => span.textContent.trim())
-      : [];
+    // const raw_tags = row.querySelector(".torrentname");
+    const tagsDOM = Array.from(tagSpans);
+    let tags = tagSpans ? tagsDOM.map((span) => span.textContent.trim()) : [];
 
     // console.log(index);
     // console.log(torrentName);
     // console.log(tags);
 
-    if (
-      tags.length != 0 &&
-      (tags[0].includes("天") ||
-        tags[0].includes("时") ||
-        tags[0].includes("分钟"))
-    ) {
+    if (freeType != "") {
       // console.log(tags[0]);
       tags.shift();
+      tagsDOM.shift();
     }
+    const raw_tags = tagsDOM.map((el) => el.outerHTML).join("");
+    // console.log(raw_tags);
 
     // 获取描述
     const descriptionCell = row.querySelector(".torrentname td:nth-child(2)");
@@ -201,6 +199,7 @@ function TORRENT_LIST_TO_JSON(torrent_list_Dom) {
       collectLink,
       free_type: freeType,
       free_remaining_time: freeRemainingTime,
+      raw_tags,
       tags,
       description,
       comments,
@@ -241,6 +240,7 @@ function RENDER_TORRENT_JSON_IN_MASONRY(
       collectLink,
       free_type: freeType,
       free_remaining_time: freeRemainingTime,
+      raw_tags,
       tags,
       description,
       comments,
@@ -252,8 +252,11 @@ function RENDER_TORRENT_JSON_IN_MASONRY(
     } = data;
 
     return `
+<!-- 标题 & 跳转详情链接 -->    
 <div class="card-header">
-  <a class="two-lines" src="${torrentLink}" href="${torrentLink}" target="_blank">${torrentName}</a>
+  <a class="two-lines" src="${torrentLink}" href="${torrentLink}" target="_blank">
+    <strong>${torrentName}</strong>
+  </a>
 </div>
 <div class="card-body">
   <div class="card-image">
@@ -262,28 +265,64 @@ function RENDER_TORRENT_JSON_IN_MASONRY(
       ${torrentIndex + 1}
     </div>  
   </div>
-  <div class="card-details">
-    <div class="card-line"><strong>Category:</strong> ${category}</div>
-    <!--<div class="card-line"><strong>Torrent ID:</strong> ${torrentId}</div> -->
-    <div class="card-line">
-      <strong>Tags:</strong> ${tags.join(", ")}
+
+  <!-- 副标题 -->
+  ${
+    description
+      ? `<div class="card-line"><strong>副标题:</strong> ${description}</div>`
+      : ""
+  }
+  
+
+  <!-- 标签 Tags -->
+  <div class="card-line cl-tags">
+    ${raw_tags}
+    <!-- <strong>Tags:</strong> ${tags.join(", ")} -->
+  </div>
+
+  <div class="card-alter">
+    <!-- 免费类型 & 免费剩余时间 -->
+    ${
+      freeType
+        ? `
+          <div 
+            class="${freeType}" 
+            style="color:${freeType == "Free" ? "blue" : "green"}">
+            <strong>${freeType}:</strong> ${freeRemainingTime}
+          </div>
+          `
+        : ""
+    }
+    <!-- 置顶等级 -->
+    ${pattMsg ? `<div><strong>置顶等级:</strong> ${pattMsg}</div>` : ""}
+  </div>
+
+  <div class="card-details">  
+    <div class="card-line cl-2">
+      <!-- 类别 -->
+      <strong>分区: ${category}</strong> 
+      <!-- 大小 -->
+      <strong>大小: ${size}</strong> 
     </div>
-    <div class="card-line"><strong>Description:</strong> ${description}</div>
+    
+    <!-- 种子id, 默认不显示 -->
+    <!--<div class="card-line"><strong>Torrent ID:</strong> ${torrentId}</div> -->
+    
+    
+
+    <div class="card-line"><strong>上传时间:</strong> ${uploadDate}</div>
+    
     <div class="card-line"><strong>Comments:</strong> ${comments}</div>
-    <div class="card-line"><strong>Uploaded:</strong> ${uploadDate}</div>
-    <div class="card-line"><strong>Size:</strong> ${size}</div>
     <div class="card-line"><strong>Seeders:</strong> ${seeders}</div>
     <div class="card-line"><strong>Leechers:</strong> ${leechers}</div>
     <div class="card-line"><strong>Snatched:</strong> ${snatched}</div>
-    <div class="card-line"><strong>Download Link:</strong> <a src="${downloadLink}" href="${downloadLink}">下载</a></div>
-    <div class="card-line"><strong>Collect Link:</strong> <a href="${collectLink}">Collect</a></div>
+    <div class="card-line cl-2">
+      <strong>下载:</strong> <a src="${downloadLink}" href="${downloadLink}">下载</a>
+      <strong>收藏:</strong> <a href="${collectLink}">Collect</a>
+    </div>
   </div>
 </div>
-<div class="card-footer">
-  <div><strong>Free Type:</strong> ${freeType}</div>
-  <div><strong>Free Remaining Time:</strong> ${freeRemainingTime}</div>
-  <div><strong>Patt Msg:</strong> ${pattMsg}</div>
-</div>
+
     `;
   };
 
@@ -574,6 +613,11 @@ button#btnReLayout {
   margin: 6px 0;
 }
 
+/* 卡片行默认样式 */
+.card-line{
+  margin-bottom: 1px;
+}
+
 /* 卡片标题: 默认两行 */
 .two-lines {
   display: -webkit-box;
@@ -589,18 +633,43 @@ button#btnReLayout {
   -webkit-line-clamp: 100;
 }
 
+/* 卡片信息行: 类别 & 大小 行 */
+.cl-2{
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+/* 卡片信息行: 标签行 */
+.cl-tags{
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  
+  transform: translateX(4px);
+}
+
+
+.cl-center{
+
+}
+
 /* 卡片图像div */
 .card-image {
   height: 100%;
   position: relative;
-
-  position: relative;
+  margin-bottom: 2px;
 }
 
 /* 卡片图像div -> img标签 */
 .card-image img {
   width: 100%;
   object-fit: cover;
+}
+
+/* 卡片可选信息 */
+.card-alter{
+  text-align: center;
 }
 
 /* 卡片索引 */
