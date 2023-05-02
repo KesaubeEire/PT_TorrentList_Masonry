@@ -247,12 +247,6 @@ function TORRENT_LIST_TO_JSON(torrent_list_Dom) {
   return data;
 }
 
-function handleButtonClick(event) {
-  // 使用事件对象的 target 属性获取触发事件的元素
-  var button = event.target;
-  console.log("按钮的引用：", button);
-}
-
 /**
  * 将种子列表信息渲染为卡片放入瀑布流
  * @param {DOM} waterfallNode 瀑布流容器dom
@@ -510,7 +504,7 @@ function CHANGE_CARD_WIDTH(targetWidth, containerDom, masonry) {
  * @param {string} card_id 种子卡片id
  */
 function COLLET_AND_ICON_CHANGE(jsCodeLink, card_id) {
-  console.log(jsCodeLink, card_id);
+  // console.log(jsCodeLink, card_id);
   try {
     // 收藏链接
     window.location.href = jsCodeLink;
@@ -519,7 +513,7 @@ function COLLET_AND_ICON_CHANGE(jsCodeLink, card_id) {
     const btn = document.querySelector(`button#${card_id}`);
     const img = btn.children[0];
     img.className = img.className == "delbookmark" ? "bookmark" : "delbookmark";
-    console.log(btn);
+    // console.log(btn);
   } catch (error) {
     // GUI 通知一下捏
     console.error(error);
