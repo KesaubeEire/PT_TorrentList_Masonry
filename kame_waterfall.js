@@ -22,7 +22,7 @@ const domain = "https://kamept.com/";
 var masonry;
 window.masonry = masonry;
 
-/** 卡片相关参数顶层对象 */
+/** 瀑布流卡片相关参数顶层对象 */
 const CARD = {
   /** 瀑布流卡片宽度 */
   CARD_WIDTH: 200,
