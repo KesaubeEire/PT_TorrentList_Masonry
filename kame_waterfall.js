@@ -2,7 +2,7 @@
 // @name            KamePT种子列表无限下拉瀑布流视图
 // @name:en         KamePT_waterfall_torrent
 // @namespace       https://github.com/KesaubeEire/PT_TorrentList_Masonry
-// @version         0.1.2
+// @version         0.1.3
 // @description     KamePT种子列表无限下拉瀑布流视图(描述不能与名称相同, 乐)
 // @description:en  KamePT torrent page waterfall view
 // @author          Kesa
@@ -22,12 +22,18 @@ const domain = "https://kamept.com/";
 var masonry;
 window.masonry = masonry;
 
-/** 瀑布流卡片宽度 */
-var CARD_WIDTH = 200;
-window.CARD_WIDTH = CARD_WIDTH;
+/** 卡片相关参数顶层对象 */
+const CARD = {
+  /** 瀑布流卡片宽度 */
+  CARD_WIDTH: 200,
 
-/** 瀑布流卡片索引 */
-let CARD_INDEX = 0;
+  /** 瀑布流卡片边框宽度 -> 这个2是真值, 但是边框好像是会随着分辨率和缩放变化, 给高有利大分辨率, 给低有利于小分辨率 */
+  CARD_BORDER: 3,
+
+  /** 瀑布流卡片索引 */
+  CARD_INDEX: 0,
+};
+window.CARD_WIDTH = CARD.CARD_WIDTH;
 
 /** 翻页相关参数顶层对象 */
 const PAGE = {
@@ -76,7 +82,7 @@ function TORRENT_LIST_TO_JSON(torrent_list_Dom) {
     if (!category) return;
 
     // 加index
-    const torrentIndex = CARD_INDEX++;
+    const torrentIndex = CARD.CARD_INDEX++;
 
     // 获取种子名称
     const torrentNameLink = row.querySelector(".torrentname a");
@@ -287,7 +293,7 @@ function RENDER_TORRENT_JSON_IN_MASONRY(
     card.innerHTML = cardTemplate(rowData);
 
     // 生成新的时候再改一次图片宽度
-    card.style.width = `${CARD_WIDTH}px`;
+    card.style.width = `${CARD.CARD_WIDTH}px`;
 
     //  |--|-- 3.1.1 渲染完成图片后调整构图
     const card_img = card.querySelector(".card-image--img");
@@ -369,12 +375,15 @@ function GET_CARD_GUTTER(containerDom, card_width) {
   const _width = containerDom.clientWidth;
 
   // 获取一个合适的 gutter
-  const card_real_width = card_width + 2;
+  const card_real_width = card_width + CARD.CARD_BORDER;
   const columns = Math.floor(_width / card_real_width);
   const gutter = (_width - columns * card_real_width) / (columns - 1);
-  // console.log(`列数:${columns} 间隔:${gutter}`);
-  // console.log(`容器宽:${_width} 列宽:${masonry ? masonry.columnWidth : "对象"}`);
-  return gutter;
+  console.log(`列数:${columns} 间隔:${gutter}`);
+  console.log(
+    `容器宽:${_width} 列宽:${masonry ? masonry.columnWidth : "对象"}`
+  );
+
+  return Math.floor(gutter);
 }
 
 /**
@@ -386,7 +395,7 @@ function GET_CARD_GUTTER(containerDom, card_width) {
 function CHANGE_CARD_WIDTH(targetWidth, containerDom, masonry) {
   // 改变卡片宽度
   for (const card of containerDom.childNodes) {
-    // console.log(CARD_WIDTH);
+    // console.log(CARD.CARD_WIDTH);
     card.style.width = `${targetWidth}px`;
   }
 
@@ -476,18 +485,18 @@ function debounce(func, delay) {
     }
 
     // 动态调整卡片宽度
-    CARD_WIDTH = CARD_WIDTH == 200 ? 300 : 200;
-    CHANGE_CARD_WIDTH(CARD_WIDTH, waterfallNode, masonry);
+    CARD.CARD_WIDTH = CARD.CARD_WIDTH == 200 ? 300 : 200;
+    CHANGE_CARD_WIDTH(CARD.CARD_WIDTH, waterfallNode, masonry);
     masonry.layout();
 
     // // 改变卡片宽度
     // for (const card of waterfallNode.childNodes) {
-    //   console.log(CARD_WIDTH);
-    //   card.style.width = `${CARD_WIDTH}px`;
+    //   console.log(CARD.CARD_WIDTH);
+    //   card.style.width = `${CARD.CARD_WIDTH}px`;
     // }
 
     // // 调整卡片间隔 gutter
-    // masonry.options.gutter = GET_CARD_GUTTER(waterfallNode, CARD_WIDTH);
+    // masonry.options.gutter = GET_CARD_GUTTER(waterfallNode, CARD.CARD_WIDTH);
 
     // // 重新布局瀑布流
     // masonry.layout();
@@ -554,7 +563,7 @@ button#btnReLayout {
 
 /* 卡片 */
 .card {
-  width: ${CARD_WIDTH}px;
+  width: ${CARD.CARD_WIDTH}px;
   border: 1px solid #ccc;
   border-radius: 5px;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
@@ -623,7 +632,7 @@ button#btnReLayout {
     masonry = new Masonry(waterfallNode, {
       itemSelector: ".card",
       columnWidth: ".card",
-      gutter: GET_CARD_GUTTER(waterfallNode, CARD_WIDTH),
+      gutter: GET_CARD_GUTTER(waterfallNode, CARD.CARD_WIDTH),
     });
 
     // console.log(masonry);
@@ -631,7 +640,7 @@ button#btnReLayout {
     //    -- 3.3.2 监听窗口大小变化事件
     window.addEventListener("resize", function () {
       // 调整卡片间隔 gutter
-      masonry.options.gutter = GET_CARD_GUTTER(waterfallNode, CARD_WIDTH);
+      masonry.options.gutter = GET_CARD_GUTTER(waterfallNode, CARD.CARD_WIDTH);
 
       // 重新布局瀑布流
       masonry.layout();
@@ -712,7 +721,7 @@ button#btnReLayout {
         PUT_TORRENT_INTO_MASONRY(table, waterfallNode, false);
 
         // 生成新的时候再改一次图片宽度
-        CHANGE_CARD_WIDTH(CARD_WIDTH, waterfallNode, masonry);
+        CHANGE_CARD_WIDTH(CARD.CARD_WIDTH, waterfallNode, masonry);
 
         // 页数更新, 在上面几行更新会导致没有下一页的情况下仍然触发
         PAGE.IS_ORIGIN = false;
