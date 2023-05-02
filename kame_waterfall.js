@@ -2,7 +2,7 @@
 // @name            KamePT种子列表无限下拉瀑布流视图
 // @name:en         KamePT_waterfall_torrent
 // @namespace       https://github.com/KesaubeEire/PT_TorrentList_Masonry
-// @version         0.1.3
+// @version         0.2.0
 // @description     KamePT种子列表无限下拉瀑布流视图(描述不能与名称相同, 乐)
 // @description:en  KamePT torrent page waterfall view
 // @author          Kesa
@@ -54,6 +54,32 @@ const PAGE = {
 
   /** 翻页: 下一页的链接 */
   NEXT_URL: "",
+};
+
+/** 网站图标链接 */
+const ICON = {
+  /** 大小图标 */
+  SIZE: '<img class="size" src="pic/trans.gif" style=" transform: translateY(-0.4px);" alt="size" title="大小">',
+  /** 评论图标 */
+  COMMENT:
+    '<img class="comments" src="pic/trans.gif" alt="comments" title="评论数">',
+  /** 上传人数图标 */
+  SEEDERS:
+    '<img class="seeders" src="pic/trans.gif" alt="seeders" title="种子数">',
+  /** 下载人数图标 */
+  LEECHERS:
+    '<img class="leechers" src="pic/trans.gif" alt="leechers" title="下载数">',
+  /** 已完成人数图标 */
+  SNATCHED:
+    '<img class="snatched" src="pic/trans.gif" alt="snatched" title="完成数">',
+  /** 下载图标 */
+  DOWNLOAD:
+    '<img class="download" src="pic/trans.gif" style=" transform: translateY(1px);" alt="download" title="下载本种">',
+  /** 未收藏图标 */
+  COLLET:
+    '<img class="delbookmark" src="pic/trans.gif" alt="Unbookmarked" title="收藏">',
+  /** 已收藏图标 */
+  COLLETED: '<img class="bookmark" src="pic/trans.gif" alt="Bookmarked">',
 };
 
 // |-- 0.1 顶层方法
@@ -114,7 +140,11 @@ function TORRENT_LIST_TO_JSON(torrent_list_Dom) {
     const downloadLink = `${domain}download.php?id=${torrentId}`;
 
     // 获取收藏链接
-    const collectLink = `javascript: bookmark(${torrentId},0);`;
+    const collectLink = `javascript: bookmark(${torrentId},${torrentIndex});`;
+    // 获取收藏状态
+    const collectDOM = row.querySelector(".torrentname a[id^='bookmark']");
+    const collectState = collectDOM.children[0].alt;
+    console.log(collectState);
 
     // 获取免费折扣类型
     const freeTypeImg = row.querySelector('img[class^="pro_"]');
@@ -197,6 +227,7 @@ function TORRENT_LIST_TO_JSON(torrent_list_Dom) {
       pattMsg,
       downloadLink,
       collectLink,
+      collectState,
       free_type: freeType,
       free_remaining_time: freeRemainingTime,
       raw_tags,
@@ -214,6 +245,12 @@ function TORRENT_LIST_TO_JSON(torrent_list_Dom) {
     data.push(rowData);
   });
   return data;
+}
+
+function handleButtonClick(event) {
+  // 使用事件对象的 target 属性获取触发事件的元素
+  var button = event.target;
+  console.log("按钮的引用：", button);
 }
 
 /**
@@ -238,6 +275,7 @@ function RENDER_TORRENT_JSON_IN_MASONRY(
       pattMsg,
       downloadLink,
       collectLink,
+      collectState,
       free_type: freeType,
       free_remaining_time: freeRemainingTime,
       raw_tags,
@@ -252,8 +290,13 @@ function RENDER_TORRENT_JSON_IN_MASONRY(
     } = data;
 
     return `
+<!-- 分区类别 -->
+<div class="card-category">
+  ${category}
+</div>
+
 <!-- 标题 & 跳转详情链接 -->    
-<div class="card-header">
+<div class="card-title">
   <a class="two-lines" src="${torrentLink}" href="${torrentLink}" target="_blank">
     <strong>${torrentName}</strong>
   </a>
@@ -269,7 +312,7 @@ function RENDER_TORRENT_JSON_IN_MASONRY(
   <!-- 副标题 -->
   ${
     description
-      ? `<div class="card-line"><strong>副标题:</strong> ${description}</div>`
+      ? `<div class="card-description"><strong>副标题:</strong> ${description}</div>`
       : ""
   }
   
@@ -298,28 +341,41 @@ function RENDER_TORRENT_JSON_IN_MASONRY(
   </div>
 
   <div class="card-details">  
-    <div class="card-line cl-2">
-      <!-- 类别 -->
-      <strong>分区: ${category}</strong> 
+    <div class="card-line">
       <!-- 大小 -->
-      <strong>大小: ${size}</strong> 
+      <div class="cl-center">
+        ${ICON.SIZE}&nbsp;${size}
+      </div> 
+
+      <!-- 下载 -->
+      &nbsp;&nbsp;
+      <div class="cl-center">
+        ${ICON.DOWNLOAD}&nbsp;
+        <strong><a src="${downloadLink}" href="${downloadLink}">下载</a></strong>
+      </div>
+
+      <!-- 收藏 -->
+      &nbsp;&nbsp;
+      <div class="cl-center">
+        <button class="btnCollet cl-center" id="tI_${torrentIndex}" onclick='COLLET_AND_ICON_CHANGE("${collectLink}", "tI_${torrentIndex}")'>
+        ${collectState == "Unbookmarked" ? ICON.COLLET : ICON.COLLETED}
+        &nbsp;收藏
+        </button>
+      </div>
     </div>
     
     <!-- 种子id, 默认不显示 -->
     <!--<div class="card-line"><strong>Torrent ID:</strong> ${torrentId}</div> -->
     
-    
-
+    <!-- 上传时间 -->
     <div class="card-line"><strong>上传时间:</strong> ${uploadDate}</div>
     
-    <div class="card-line"><strong>Comments:</strong> ${comments}</div>
-    <div class="card-line"><strong>Seeders:</strong> ${seeders}</div>
-    <div class="card-line"><strong>Leechers:</strong> ${leechers}</div>
-    <div class="card-line"><strong>Snatched:</strong> ${snatched}</div>
-    <div class="card-line cl-2">
-      <strong>下载:</strong> <a src="${downloadLink}" href="${downloadLink}">下载</a>
-      <strong>收藏:</strong> <a href="${collectLink}">Collect</a>
-    </div>
+    <div class="card-line">
+      ${ICON.COMMENT}&nbsp;<strong>${comments}</strong>&nbsp;&nbsp;
+      ${ICON.SEEDERS}&nbsp;<strong>${seeders}</strong>&nbsp;&nbsp;
+      ${ICON.LEECHERS}&nbsp;<strong>${leechers}</strong>&nbsp;&nbsp;
+      ${ICON.SNATCHED}&nbsp;<strong>${snatched}</strong>
+    </div>    
   </div>
 </div>
 
@@ -342,6 +398,7 @@ function RENDER_TORRENT_JSON_IN_MASONRY(
       // 加载完图片后重新布局 Masonry
       if (masonry) {
         // TODO: 这里可以写个防抖优化性能
+        // TODO: 人好像自带防抖的, 哈哈......
         masonry.layout();
       }
 
@@ -446,6 +503,29 @@ function CHANGE_CARD_WIDTH(targetWidth, containerDom, masonry) {
   // 重新布局瀑布流
   masonry.layout();
 }
+
+/**
+ * 执行收藏动作并对制定卡片切换图标
+ * @param {string} jsCodeLink js的收藏代码
+ * @param {string} card_id 种子卡片id
+ */
+function COLLET_AND_ICON_CHANGE(jsCodeLink, card_id) {
+  console.log(jsCodeLink, card_id);
+  try {
+    // 收藏链接
+    window.location.href = jsCodeLink;
+
+    // 操作相应的收藏图片
+    const btn = document.querySelector(`button#${card_id}`);
+    const img = btn.children[0];
+    img.className = img.className == "delbookmark" ? "bookmark" : "delbookmark";
+    console.log(btn);
+  } catch (error) {
+    // GUI 通知一下捏
+    console.error(error);
+  }
+}
+window.COLLET_AND_ICON_CHANGE = COLLET_AND_ICON_CHANGE;
 
 /**
  * 防抖函数
@@ -611,11 +691,16 @@ button#btnReLayout {
   /* box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3); */
   /* margin: 10px; */
   margin: 6px 0;
+  padding-bottom: 2px;
 }
 
 /* 卡片行默认样式 */
 .card-line{
   margin-bottom: 1px;
+
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
 }
 
 /* 卡片标题: 默认两行 */
@@ -625,7 +710,7 @@ button#btnReLayout {
   -webkit-box-orient: vertical;
   overflow: hidden;
 
-  transition: all 0.3s;
+  transition: color 0.3s;
 }
 
 /* 卡片标题: hover时变为正常 */
@@ -633,8 +718,8 @@ button#btnReLayout {
   -webkit-line-clamp: 100;
 }
 
-/* 卡片信息行: 类别 & 大小 行 */
-.cl-2{
+/* 卡片信息: flex 居中 */
+.cl-center{
   display: flex;
   justify-content: space-evenly;
   align-items: center;
@@ -649,9 +734,12 @@ button#btnReLayout {
   transform: translateX(4px);
 }
 
-
-.cl-center{
-
+/* 卡片简介总容器 */
+.card-details{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 }
 
 /* 卡片图像div */
@@ -691,6 +779,11 @@ button#btnReLayout {
 
   display: flex;
   align-items: center;
+}
+
+/* 卡片索引 */
+.btnCollet{
+  padding: 1px 2px;
 }
 `;
 
