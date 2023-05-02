@@ -253,7 +253,7 @@ function RENDER_TORRENT_JSON_IN_MASONRY(
 
     return `
 <div class="card-header">
-  <a src="${torrentLink}" href="${torrentLink}" target="_blank">${torrentName}</a>
+  <a class="two-lines" src="${torrentLink}" href="${torrentLink}" target="_blank">${torrentName}</a>
 </div>
 <div class="card-body">
   <div class="card-image">
@@ -294,6 +294,8 @@ function RENDER_TORRENT_JSON_IN_MASONRY(
 
     // 生成新的时候再改一次图片宽度
     card.style.width = `${CARD.CARD_WIDTH}px`;
+    // z-index 逐渐变小, 使得展开标题时本卡片的内容可以不被下面的卡片遮挡
+    card.style.zIndex = 10000 - rowData.torrentIndex;
 
     //  |--|-- 3.1.1 渲染完成图片后调整构图
     const card_img = card.querySelector(".card-image--img");
@@ -359,7 +361,7 @@ function PUT_TORRENT_INTO_MASONRY(
 
   // DEBUG:打印获得的数据
   console.log(`渲染行数: ${data.length}`);
-  console.log(data);
+  // console.log(data);
 
   // 将种子列表信息渲染为卡片放入瀑布流
   RENDER_TORRENT_JSON_IN_MASONRY(waterfallNode, data, isFirst);
@@ -378,10 +380,10 @@ function GET_CARD_GUTTER(containerDom, card_width) {
   const card_real_width = card_width + CARD.CARD_BORDER;
   const columns = Math.floor(_width / card_real_width);
   const gutter = (_width - columns * card_real_width) / (columns - 1);
-  console.log(`列数:${columns} 间隔:${gutter}`);
-  console.log(
-    `容器宽:${_width} 列宽:${masonry ? masonry.columnWidth : "对象"}`
-  );
+  // console.log(`列数:${columns} 间隔:${gutter}`);
+  // console.log(
+  //   `容器宽:${_width} 列宽:${masonry ? masonry.columnWidth : "对象"}`
+  // );
 
   return Math.floor(gutter);
 }
@@ -566,9 +568,25 @@ button#btnReLayout {
   width: ${CARD.CARD_WIDTH}px;
   border: 1px solid #ccc;
   border-radius: 5px;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+  background: white;
+  /* box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3); */
   /* margin: 10px; */
   margin: 6px 0;
+}
+
+/* 卡片标题: 默认两行 */
+.two-lines {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+
+  transition: all 0.3s;
+}
+
+/* 卡片标题: hover时变为正常 */
+.two-lines:hover {
+  -webkit-line-clamp: 100;
 }
 
 /* 卡片图像div */
