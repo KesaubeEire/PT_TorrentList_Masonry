@@ -697,8 +697,6 @@ button#btnReLayout {
   margin: 6px 0;
   
   overflow: hidden;
-
-  transition: all 0.1s;
 }
 
 .card:hover {
