@@ -564,7 +564,7 @@ function NEXUS_TOOLS() {
         }
       }
       let log = `innerWidth: ${window.innerWidth}, innerHeight: ${window.innerHeight}, pageX: ${e.pageX}, pageY: ${e.pageY}, imgWidth: ${imgWidth}, imgHeight: ${imgHeight}, width: ${width}, height: ${height}, offsetX: ${offsetX}, offsetY: ${offsetY}, changeOffsetX: ${changeOffsetX}, changeOffsetY: ${changeOffsetY}`;
-      console.log(log);
+      // console.log(log);
       if (imgWidth > width) {
         imgWidth = width;
         imgHeight = imgWidth / ratio;
@@ -628,7 +628,7 @@ function NEXUS_TOOLS() {
     // lazy load
     if ("IntersectionObserver" in window) {
       let imgList = [...document.querySelectorAll(".nexus-lazy-load_Kesa")];
-      console.log(imgList);
+      // console.log(imgList);
       const io = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
           const el = entry.target;
