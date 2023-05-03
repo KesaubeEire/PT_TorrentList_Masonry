@@ -2,7 +2,9 @@
 
 ![gif_preview.gif](https://github.com/KesaubeEire/PT_TorrentList_Masonry/blob/main/preview/gif_preview01.gif?raw=true)
 
-![gif_preview.gif](https://github.com/KesaubeEire/PT_TorrentList_Masonry/blob/main/preview/gif_preview02.gif?raw=true)
+<!-- ![gif_preview.gif](https://github.com/KesaubeEire/PT_TorrentList_Masonry/blob/main/preview/gif_preview02.gif?raw=true) -->
+
+<!-- ![gif_preview.gif](https://github.com/KesaubeEire/PT_TorrentList_Masonry/blob/main/preview/gif_preview03.gif?raw=true) -->
 
 <!-- ![gif_preview.gif](https://github.com/KesaubeEire/PT_TorrentList_Masonry/blob/main/preview/gif_preview.gif?raw=true) -->
 
@@ -12,7 +14,7 @@ RT, 本油猴脚本(目前)专为 KamePT 打造, 让你顺畅划划划, 不必�
 
 - 其他事务
   - [ ] 将 油猴脚本从成人区撤离, 改为正常
-  - [ ] 将 特别区作为截图示范
+  - [ ] 将 特别区作为截图示范, 添加 /special.php 的适配
 - 功能列表
 
   - [x] 瀑布流基础排版
@@ -24,6 +26,7 @@ RT, 本油猴脚本(目前)专为 KamePT 打造, 让你顺畅划划划, 不必�
       - [ ] 点击卡片不是打开新页面，而是在本页面打开 iframe 直接看内容，看完关掉，都不用切换页面了
       - [ ] 显示当前是否下载以及下载进度(from tg by @Charlie Swift)
       - [ ] 卡片背景颜色适配主题(from tg by @LNN)
+      - [ ] 去掉副标题(from tg by @lslqtz)
 
   - [ ] 将一些参数配置为可变
       - [ ] 配置 LocalStorage 记录参数捏
