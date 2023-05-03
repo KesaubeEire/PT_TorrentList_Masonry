@@ -2,7 +2,7 @@
 // @name            KamePT种子列表无限下拉瀑布流视图
 // @name:en         KamePT_waterfall_torrent
 // @namespace       https://github.com/KesaubeEire/PT_TorrentList_Masonry
-// @version         0.2.5
+// @version         0.2.6
 // @description     KamePT种子列表无限下拉瀑布流视图(描述不能与名称相同, 乐)
 // @description:en  KamePT torrent page waterfall view
 // @author          Kesa
@@ -156,7 +156,9 @@ function TORRENT_LIST_TO_JSON(torrent_list_Dom) {
     const freeTypeImg = row.querySelector('img[class^="pro_"]');
     // console.log(freeTypeImg);
     // console.log(freeTypeImg.alt);
-    const freeType = freeTypeImg ? freeTypeImg.alt : "";
+    const freeType = freeTypeImg
+      ? "_" + freeTypeImg.alt.replace(/\s+/g, "")
+      : "";
 
     // 获取免费剩余时间
     const freeRemainingTimeSpan = row.querySelector("font");
@@ -299,7 +301,7 @@ function RENDER_TORRENT_JSON_IN_MASONRY(
 <!-- 标题 & 跳转详情链接 -->    
 <div class="card-title">
   <a class="two-lines" src="${torrentLink}" href="${torrentLink}" target="_blank">
-    <strong>${torrentName}</strong>
+    <b>${torrentName}</b>
   </a>
 </div>
 <div class="card-body">
@@ -308,6 +310,21 @@ function RENDER_TORRENT_JSON_IN_MASONRY(
     <div class="card-index">
       ${torrentIndex + 1}
     </div>  
+  </div>
+
+  <div class="card-alter">
+    <!-- 免费类型 & 免费剩余时间 -->
+    ${
+      freeType
+        ? `
+          <div class="free_flag ${freeType}">
+            <b>${freeType}: ${freeRemainingTime}_</b>
+          </div>
+          `
+        : ""
+    }
+    <!-- 置顶等级 -->
+    ${pattMsg ? `<div><b>置顶等级:</b> ${pattMsg}</div>` : ""}
   </div>
 
   <!-- 副标题 -->
@@ -321,25 +338,9 @@ function RENDER_TORRENT_JSON_IN_MASONRY(
   <!-- 标签 Tags -->
   <div class="card-line cl-tags">
     ${raw_tags}
-    <!-- <strong>Tags:</strong> ${tags.join(", ")} -->
+    <!-- <b>Tags:</b> ${tags.join(", ")} -->
   </div>
 
-  <div class="card-alter">
-    <!-- 免费类型 & 免费剩余时间 -->
-    ${
-      freeType
-        ? `
-          <div 
-            class="${freeType}" 
-            style="color:${freeType == "Free" ? "blue" : "green"}">
-            <strong>${freeType}:</strong> ${freeRemainingTime}
-          </div>
-          `
-        : ""
-    }
-    <!-- 置顶等级 -->
-    ${pattMsg ? `<div><strong>置顶等级:</strong> ${pattMsg}</div>` : ""}
-  </div>
 
   <div class="card-details">  
     <div class="card-line">
@@ -352,7 +353,7 @@ function RENDER_TORRENT_JSON_IN_MASONRY(
       &nbsp;&nbsp;
       <div class="cl-center">
         ${ICON.DOWNLOAD}&nbsp;
-        <strong><a src="${downloadLink}" href="${downloadLink}">下载</a></strong>
+        <b><a src="${downloadLink}" href="${downloadLink}">下载</a></b>
       </div>
 
       <!-- 收藏 -->
@@ -360,28 +361,26 @@ function RENDER_TORRENT_JSON_IN_MASONRY(
       <div class="cl-center">
         <div class="btnCollet cl-center" id="tI_${torrentIndex}" onclick='COLLET_AND_ICON_CHANGE("${collectLink}", "tI_${torrentIndex}")'>
         ${collectState == "Unbookmarked" ? ICON.COLLET : ICON.COLLETED}
-        &nbsp;<strong>收藏</strong>
+        &nbsp;<b>收藏</b>
         </div>
       </div>
     </div>
     
     <!-- 种子id, 默认不显示 -->
-    <!--<div class="card-line"><strong>Torrent ID:</strong> ${torrentId}</div> -->
+    <!--<div class="card-line"><b>Torrent ID:</b> ${torrentId}</div> -->
     
     <!-- 上传时间 -->
-    <div class="card-line"><strong>上传时间:</strong> ${uploadDate}</div>
+    <div class="card-line"><b>上传时间:</b> ${uploadDate}</div>
     
     <div class="card-line">
-      ${ICON.COMMENT}&nbsp;<strong>${comments}</strong>&nbsp;&nbsp;
-      ${ICON.SEEDERS}&nbsp;<strong>${seeders}</strong>&nbsp;&nbsp;
-      ${ICON.LEECHERS}&nbsp;<strong>${leechers}</strong>&nbsp;&nbsp;
-      ${ICON.SNATCHED}&nbsp;<strong>${snatched}</strong>
+      ${ICON.COMMENT}&nbsp;<b>${comments}</b>&nbsp;&nbsp;
+      ${ICON.SEEDERS}&nbsp;<b>${seeders}</b>&nbsp;&nbsp;
+      ${ICON.LEECHERS}&nbsp;<b>${leechers}</b>&nbsp;&nbsp;
+      ${ICON.SNATCHED}&nbsp;<b>${snatched}</b>
     </div>    
   </div>
 </div>
-</div>
-
-    `;
+</div>`;
   };
 
   for (const rowData of torrent_json) {
@@ -776,6 +775,23 @@ button#btnReLayout {
 /* 卡片可选信息 */
 .card-alter{
   text-align: center;
+}
+
+
+/* 免费类型&剩余时间 */
+.free_flag{
+  padding: 2px;
+  border-radius: 4px;
+  margin-bottom: 2px;
+}
+._Free{
+  color: blue;
+  background-color: #00e6
+}
+
+._2XFree{
+  color: green;
+  background-color: #0e0
 }
 
 /* 卡片索引 */
