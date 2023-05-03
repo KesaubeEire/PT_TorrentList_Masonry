@@ -147,7 +147,7 @@ function TORRENT_LIST_TO_JSON(torrent_list_Dom) {
     // 获取收藏状态
     const collectDOM = row.querySelector(".torrentname a[id^='bookmark']");
     const collectState = collectDOM.children[0].alt;
-    console.log(collectState);
+    // console.log(collectState);
 
     // 获取免费折扣类型
     const freeTypeImg = row.querySelector('img[class^="pro_"]');
