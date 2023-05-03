@@ -2,14 +2,12 @@
 // @name            KamePT种子列表无限下拉瀑布流视图
 // @name:en         KamePT_waterfall_torrent
 // @namespace       https://github.com/KesaubeEire/PT_TorrentList_Masonry
-// @version         0.2.3
+// @version         0.2.4
 // @description     KamePT种子列表无限下拉瀑布流视图(描述不能与名称相同, 乐)
 // @description:en  KamePT torrent page waterfall view
 // @author          Kesa
 // @match           https://kamept.com/torrents.php*
 // @match           https://kamept.com/special.php*
-// @match           http://2112.gq/torrents.php*
-// @match           http://2112.gq/special.php*
 // @icon            https://kamept.com/favicon.ico
 // @grant           none
 // @license         MIT
@@ -18,6 +16,11 @@
 // FIXME:
 // 0. 一些顶层设计 --------------------------------------------------------------------------------------
 // |-- 0.1 顶层参数&对象
+/** 获取主题背景色 */
+const mainOuterDOM = document.querySelector("table.mainouter");
+const themeColor = window.getComputedStyle(mainOuterDOM)["background-color"];
+console.log("背景颜色:", themeColor);
+
 /** kame 域名 */
 const domain = "https://kamept.com/";
 
@@ -288,6 +291,7 @@ function RENDER_TORRENT_JSON_IN_MASONRY(
 
     return `
 <!-- 分区类别 -->
+<div class="card-holder">
 <div class="card-category">
   ${category}
 </div>
@@ -299,7 +303,7 @@ function RENDER_TORRENT_JSON_IN_MASONRY(
   </a>
 </div>
 <div class="card-body">
-  <div class="card-image">
+  <div class="card-image" onclick="window.open('${torrentLink}')">
     <img class="card-image--img" src="${picLink}" alt="${torrentName}" />
     <div class="card-index">
       ${torrentIndex + 1}
@@ -307,7 +311,11 @@ function RENDER_TORRENT_JSON_IN_MASONRY(
   </div>
 
   <!-- 副标题 -->
-  ${description ? `<div class="card-description"> ${description}</div>` : ""}
+  ${
+    description
+      ? `<a class="card-description" href='${torrentLink}'> ${description}</a>`
+      : ""
+  }
   
 
   <!-- 标签 Tags -->
@@ -370,6 +378,7 @@ function RENDER_TORRENT_JSON_IN_MASONRY(
       ${ICON.SNATCHED}&nbsp;<strong>${snatched}</strong>
     </div>    
   </div>
+</div>
 </div>
 
     `;
@@ -682,11 +691,24 @@ button#btnReLayout {
   width: ${CARD.CARD_WIDTH}px;
   border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 5px;
-  background-color: rgba(255, 255, 255, 0.5);
+  background-color: ${themeColor};
   /* box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3); */
   /* margin: 10px; */
   margin: 6px 0;
-  padding-bottom: 2px;
+  
+  overflow: hidden;
+
+  transition: all 0.1s;
+}
+
+.card:hover {
+  
+}
+
+.card-holder{
+  background-color: rgba(255, 255, 255, 0.5);
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0));
+  padding-bottom: 6px;
 }
 
 /* 卡片行默认样式 */
