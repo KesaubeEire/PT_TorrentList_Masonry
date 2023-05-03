@@ -2,7 +2,7 @@
 // @name            KamePT种子列表无限下拉瀑布流视图
 // @name:en         KamePT_waterfall_torrent
 // @namespace       https://github.com/KesaubeEire/PT_TorrentList_Masonry
-// @version         0.2.4
+// @version         0.2.5
 // @description     KamePT种子列表无限下拉瀑布流视图(描述不能与名称相同, 乐)
 // @description:en  KamePT torrent page waterfall view
 // @author          Kesa
@@ -358,10 +358,10 @@ function RENDER_TORRENT_JSON_IN_MASONRY(
       <!-- 收藏 -->
       &nbsp;&nbsp;
       <div class="cl-center">
-        <button class="btnCollet cl-center" id="tI_${torrentIndex}" onclick='COLLET_AND_ICON_CHANGE("${collectLink}", "tI_${torrentIndex}")'>
+        <div class="btnCollet cl-center" id="tI_${torrentIndex}" onclick='COLLET_AND_ICON_CHANGE("${collectLink}", "tI_${torrentIndex}")'>
         ${collectState == "Unbookmarked" ? ICON.COLLET : ICON.COLLETED}
-        &nbsp;收藏
-        </button>
+        &nbsp;<strong>收藏</strong>
+        </div>
       </div>
     </div>
     
@@ -518,10 +518,11 @@ function COLLET_AND_ICON_CHANGE(jsCodeLink, card_id) {
     window.location.href = jsCodeLink;
 
     // 操作相应的收藏图片
-    const btn = document.querySelector(`button#${card_id}`);
+    const btn = document.querySelector(`div#${card_id}`);
     const img = btn.children[0];
     img.className = img.className == "delbookmark" ? "bookmark" : "delbookmark";
     // console.log(btn);
+    console.log(`执行脚本${jsCodeLink}成功, 已经收藏或者取消~`);
   } catch (error) {
     // GUI 通知一下捏
     console.error(error);
@@ -801,6 +802,7 @@ button#btnReLayout {
 /* 卡片索引 */
 .btnCollet{
   padding: 1px 2px;
+  cursor: pointer;
 }
 `;
 
