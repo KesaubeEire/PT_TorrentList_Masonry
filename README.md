@@ -64,4 +64,5 @@ RT, 本油猴脚本(目前)专为 KamePT 打造, 让你顺畅划划划, 不必�
       - [x] 标题过长的话半透明背景可能会导致文字与图片重叠 (from tg by @bacz)
       - [x] 测试网站地址漏了 (from tg by @bacz)
       - [x] 收藏按钮样式调整 (from tg by @bacz)
+      - [x] 图片链接多此一举了, 直接搬原链即可 (from tg by @Kyaru)
       - [ ] ...

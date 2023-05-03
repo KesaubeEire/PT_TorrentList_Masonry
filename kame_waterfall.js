@@ -2,7 +2,7 @@
 // @name            KamePT种子列表无限下拉瀑布流视图
 // @name:en         KamePT_waterfall_torrent
 // @namespace       https://github.com/KesaubeEire/PT_TorrentList_Masonry
-// @version         0.2.6
+// @version         0.2.7
 // @description     KamePT种子列表无限下拉瀑布流视图(描述不能与名称相同, 乐)
 // @description:en  KamePT torrent page waterfall view
 // @author          Kesa
@@ -132,11 +132,9 @@ function TORRENT_LIST_TO_JSON(torrent_list_Dom) {
     const torrentId = match ? parseInt(match[1]) : null;
 
     // 获取预览图片链接
-    let picLink = row
+    const picLink = row
       .querySelector(".torrentname img")
       .getAttribute("data-src");
-    // -- 没有加域名前缀的加上
-    if (!picLink.includes("http")) picLink = domain + picLink;
 
     // 获取置顶信息
     const place_at_the_top = row.querySelector(".torrentname img.sticky");
