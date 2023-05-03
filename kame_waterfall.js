@@ -2,7 +2,7 @@
 // @name            KamePT种子列表无限下拉瀑布流视图
 // @name:en         KamePT_waterfall_torrent
 // @namespace       https://github.com/KesaubeEire/PT_TorrentList_Masonry
-// @version         0.2.7
+// @version         0.3.0
 // @description     KamePT种子列表无限下拉瀑布流视图(描述不能与名称相同, 乐)
 // @description:en  KamePT torrent page waterfall view
 // @author          Kesa
@@ -13,6 +13,7 @@
 // @license         MIT
 // ==/UserScript==
 
+// ------------------ 下面是声明区
 // FIXME:
 // 0. 一些顶层设计 --------------------------------------------------------------------------------------
 // |-- 0.1 顶层参数&对象
@@ -25,7 +26,7 @@ console.log("背景颜色:", themeColor);
 const domain = "https://kamept.com/";
 
 /** 瀑布流对象 */
-var masonry;
+let masonry;
 window.masonry = masonry;
 
 /** 瀑布流卡片相关参数顶层对象 */
@@ -304,7 +305,7 @@ function RENDER_TORRENT_JSON_IN_MASONRY(
 </div>
 <div class="card-body">
   <div class="card-image" onclick="window.open('${torrentLink}')">
-    <img class="card-image--img" src="${picLink}" alt="${torrentName}" />
+    <img class="card-image--img nexus-lazy-load_Kesa" src="pic/misc/spinner.svg" data-src="${picLink}"  alt="${torrentName}" />
     <div class="card-index">
       ${torrentIndex + 1}
     </div>  
@@ -396,35 +397,9 @@ function RENDER_TORRENT_JSON_IN_MASONRY(
     card_img.onload = function () {
       // 加载完图片后重新布局 Masonry
       if (masonry) {
-        // TODO: 这里可以写个防抖优化性能
-        // TODO: 人好像自带防抖的, 哈哈......
+        // TODO: 这里可以写个防抖优化性能, 但是人好像自带防抖的, 哈哈......
         masonry.layout();
       }
-
-      // // TODO:加载完图片添加鼠标触摸预览
-      // var imgEle,
-      //   selector = "img.preview",
-      //   imgPosition;
-      // jQuery("body")
-      //   .on("mouseover", selector, function (e) {
-      //     imgEle = jQuery(card_img);
-      //     // previewEle = jQuery('<img style="display: none;position:absolute;">').appendTo(imgEle.parent())
-      //     imgPosition = getImgPosition(e, imgEle);
-      //     let position = getPosition(e, imgPosition);
-      //     let src = imgEle.attr("src");
-      //     if (src) {
-      //       previewEle.attr("src", src).css(position).fadeIn("fast");
-      //     }
-      //   })
-      //   .on("mouseout", selector, function (e) {
-      //     // previewEle.remove()
-      //     // previewEle = null
-      //     previewEle.hide();
-      //   })
-      //   .on("mousemove", selector, function (e) {
-      //     let position = getPosition(e, imgPosition);
-      //     previewEle.css(position);
-      //   });
     };
 
     //  |--|-- 3.1.2 插入生成的元素
@@ -460,6 +435,9 @@ function PUT_TORRENT_INTO_MASONRY(
 
   // 将种子列表信息渲染为卡片放入瀑布流
   RENDER_TORRENT_JSON_IN_MASONRY(waterfallNode, data, isFirst);
+
+  // nexus 工具组
+  NEXUS_TOOLS();
 }
 
 /**
@@ -544,6 +522,144 @@ function debounce(func, delay) {
     }, delay);
   };
 }
+
+/**
+ * NEXUS 预览工具箱, 提供图片预览和图片懒加载, 神器
+ */
+function NEXUS_TOOLS() {
+  jQuery(document).ready(function () {
+    console.log("----jQuery 加载完毕 | Kesa 改版 nexus 工具启动!---");
+
+    /**
+     * 获取图片位置
+     * @param {*} e
+     * @param {*} imgEle
+     * @returns
+     */
+    function getImgPosition(e, imgEle) {
+      // console.log(e, imgEle)
+      let imgWidth = imgEle.prop("naturalWidth");
+      let imgHeight = imgEle.prop("naturalHeight");
+      let ratio = imgWidth / imgHeight;
+      let offsetX = 10;
+      let offsetY = 10;
+      let width = window.innerWidth - e.clientX;
+      let height = window.innerHeight - e.clientY;
+      let changeOffsetY = 0;
+      let changeOffsetX = false;
+      if (
+        e.clientX > window.innerWidth / 2 &&
+        e.clientX + imgWidth > window.innerWidth
+      ) {
+        changeOffsetX = true;
+        width = e.clientX;
+      }
+      if (e.clientY > window.innerHeight / 2) {
+        if (e.clientY + imgHeight / 2 > window.innerHeight) {
+          changeOffsetY = 1;
+          height = e.clientY;
+        } else if (e.clientY + imgHeight > window.innerHeight) {
+          changeOffsetY = 2;
+          height = e.clientY;
+        }
+      }
+      let log = `innerWidth: ${window.innerWidth}, innerHeight: ${window.innerHeight}, pageX: ${e.pageX}, pageY: ${e.pageY}, imgWidth: ${imgWidth}, imgHeight: ${imgHeight}, width: ${width}, height: ${height}, offsetX: ${offsetX}, offsetY: ${offsetY}, changeOffsetX: ${changeOffsetX}, changeOffsetY: ${changeOffsetY}`;
+      console.log(log);
+      if (imgWidth > width) {
+        imgWidth = width;
+        imgHeight = imgWidth / ratio;
+      }
+      if (imgHeight > height) {
+        imgHeight = height;
+        imgWidth = imgHeight * ratio;
+      }
+      if (changeOffsetX) {
+        offsetX = -(e.clientX - width + 10);
+      }
+      if (changeOffsetY == 1) {
+        offsetY = -(imgHeight - (window.innerHeight - e.clientY));
+      } else if (changeOffsetY == 2) {
+        offsetY = -imgHeight / 2;
+      }
+      return { imgWidth, imgHeight, offsetX, offsetY };
+    }
+
+    /**
+     * 获取展示位置
+     * @param {*} e
+     * @param {*} position
+     * @returns
+     */
+    function getPosition(e, position) {
+      return {
+        left: e.pageX + position.offsetX,
+        top: e.pageY + position.offsetY,
+        width: position.imgWidth,
+        height: position.imgHeight,
+      };
+    }
+
+    // preview
+    const previewEle = jQuery("#nexus-preview");
+    let imgEle;
+    const selector = "img.preview_Kesa";
+    let imgPosition;
+    jQuery("body")
+      .on("mouseover", selector, function (e) {
+        imgEle = jQuery(this);
+        // previewEle = jQuery('<img style="display: none;position:absolute;">').appendTo(imgEle.parent())
+        imgPosition = getImgPosition(e, imgEle);
+        let position = getPosition(e, imgPosition);
+        let src = imgEle.attr("src");
+        if (src) {
+          previewEle.attr("src", src).css(position).fadeIn("fast");
+        }
+      })
+      .on("mouseout", selector, function (e) {
+        // previewEle.remove()
+        // previewEle = null
+        previewEle.hide();
+      })
+      .on("mousemove", selector, function (e) {
+        let position = getPosition(e, imgPosition);
+        previewEle.css(position);
+      });
+
+    // lazy load
+    if ("IntersectionObserver" in window) {
+      let imgList = [...document.querySelectorAll(".nexus-lazy-load_Kesa")];
+      console.log(imgList);
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          const el = entry.target;
+          const intersectionRatio = entry.intersectionRatio;
+          // console.log(`el, ${el.getAttribute("data-src")}, intersectionRatio: ${intersectionRatio}`);
+          if (
+            intersectionRatio > 0 &&
+            intersectionRatio <= 1 &&
+            !el.classList.contains("preview_Kesa")
+          ) {
+            // 懒加载成功
+            // console.log(`el, ${el.getAttribute("data-src")}, loadImg`);
+            const source = el.dataset.src;
+            el.src = source;
+            el.classList.add("preview_Kesa");
+            // 加载完图片后重新布局 Masonry
+            if (masonry) {
+              // TODO: 这里可以写个防抖优化性能, 但是人好像自带防抖的, 哈哈......
+              masonry.layout();
+            }
+          }
+          el.onload = el.onerror = () => io.unobserve(el);
+        });
+      });
+
+      imgList.forEach((img) => io.observe(img));
+    }
+  });
+}
+
+// ------------------ 下面是非声明区
 
 (function () {
   "use strict";
@@ -812,9 +928,19 @@ button#btnReLayout {
 }
 
 /* 卡片索引 */
+
 .btnCollet{
   padding: 1px 2px;
   cursor: pointer;
+}
+
+/* 上面是我自己脚本的css */
+/* --------------------------------------- */
+/* 下面是改进原有的css */
+
+/* 卡片索引 */
+#nexus-preview{
+  z-index: 20000;
 }
 `;
 
@@ -830,7 +956,7 @@ button#btnReLayout {
   document.head.appendChild(style);
 
   // 创建script标签
-  var script = document.createElement("script");
+  const script = document.createElement("script");
   // 设置script标签的src属性为Masonry库的地址
   script.src =
     "https://cdnjs.cloudflare.com/ajax/libs/masonry/4.2.2/masonry.pkgd.min.js";
