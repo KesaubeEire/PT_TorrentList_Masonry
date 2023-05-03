@@ -396,6 +396,7 @@ function RENDER_TORRENT_JSON_IN_MASONRY(
     const card_img = card.querySelector(".card-image--img");
     card_img.onload = function () {
       // 加载完图片后重新布局 Masonry
+      // 这里是转圈图片的加载
       if (masonry) {
         // TODO: 这里可以写个防抖优化性能, 但是人好像自带防抖的, 哈哈......
         masonry.layout();
@@ -528,7 +529,7 @@ function debounce(func, delay) {
  */
 function NEXUS_TOOLS() {
   jQuery(document).ready(function () {
-    console.log("----jQuery 加载完毕 | Kesa 改版 nexus 工具启动!---");
+    // console.log("----jQuery 加载完毕 | Kesa 改版 nexus 工具启动!---");
 
     /**
      * 获取图片位置
@@ -645,6 +646,7 @@ function NEXUS_TOOLS() {
             el.src = source;
             el.classList.add("preview_Kesa");
             // 加载完图片后重新布局 Masonry
+            // 这里是真实图片的加载
             if (masonry) {
               // TODO: 这里可以写个防抖优化性能, 但是人好像自带防抖的, 哈哈......
               masonry.layout();

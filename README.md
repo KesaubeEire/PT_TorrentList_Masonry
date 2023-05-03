@@ -41,6 +41,7 @@ RT, 本油猴脚本(目前)专为 KamePT 打造, 让你顺畅划划划, 不必�
       - [x] 卡片背景颜色适配主题(from tg by @LNN)
       - [x] 去掉副标题(from tg by @lslqtz)
       - [x] 右上角按钮z-index置顶(from tg by @lslqtz)
+      - [x] 标签样式改为 div 的多行 flex(from tg by @bacz)
 
   - [ ] 将一些参数配置为可变
       - [ ] 配置 LocalStorage 记录参数捏
