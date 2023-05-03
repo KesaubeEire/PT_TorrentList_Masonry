@@ -2,7 +2,7 @@
 // @name            KamePT种子列表无限下拉瀑布流视图
 // @name:en         KamePT_waterfall_torrent
 // @namespace       https://github.com/KesaubeEire/PT_TorrentList_Masonry
-// @version         0.2.2
+// @version         0.2.3
 // @description     KamePT种子列表无限下拉瀑布流视图(描述不能与名称相同, 乐)
 // @description:en  KamePT torrent page waterfall view
 // @author          Kesa
@@ -307,11 +307,7 @@ function RENDER_TORRENT_JSON_IN_MASONRY(
   </div>
 
   <!-- 副标题 -->
-  ${
-    description
-      ? `<div class="card-description"> ${description}</div>`
-      : ""
-  }
+  ${description ? `<div class="card-description"> ${description}</div>` : ""}
   
 
   <!-- 标签 Tags -->
@@ -574,6 +570,7 @@ function debounce(func, delay) {
   toggleBtn.classList.add("debug");
   toggleBtn.setAttribute("id", "toggle_oldTable");
   toggleBtn.innerText = "显示原种子表格";
+  toggleBtn.style.zIndex = 10001;
 
   // 为按钮添加事件监听器
   toggleBtn.addEventListener("click", function () {
@@ -595,6 +592,7 @@ function debounce(func, delay) {
   reLayoutBtn.classList.add("debug");
   reLayoutBtn.setAttribute("id", "btnReLayout");
   reLayoutBtn.innerText = "单列宽度切换(200/300)";
+  reLayoutBtn.style.zIndex = 10002;
 
   // 为按钮添加事件监听器
   reLayoutBtn.addEventListener("click", function () {

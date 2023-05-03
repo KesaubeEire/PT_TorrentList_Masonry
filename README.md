@@ -13,8 +13,8 @@ RT, 本油猴脚本(目前)专为 KamePT 打造, 让你顺畅划划划, 不必�
 <!-- ![gif_preview.gif](./preview/gif_preview.gif) -->
 
 - 其他事务
-  - [ ] 将 油猴脚本从成人区撤离, 改为正常
-  - [ ] 将 特别区作为截图示范, 添加 /special.php 的适配
+  - [x] 将 油猴脚本从成人区撤离, 改为正常
+  - [x] 将 特别区作为截图示范, 添加 /special.php 的适配
 - 功能列表
 
   - [x] 瀑布流基础排版
@@ -25,8 +25,9 @@ RT, 本油猴脚本(目前)专为 KamePT 打造, 让你顺畅划划划, 不必�
       - [ ] 点击整个卡片跳转(from tg by @风言)
       - [ ] 点击卡片不是打开新页面，而是在本页面打开 iframe 直接看内容，看完关掉，都不用切换页面了
       - [ ] 显示当前是否下载以及下载进度(from tg by @Charlie Swift)
-      - [ ] 卡片背景颜色适配主题(from tg by @LNN)
-      - [ ] 去掉副标题(from tg by @lslqtz)
+      - [x] 卡片背景颜色适配主题(from tg by @LNN)
+      - [x] 去掉副标题(from tg by @lslqtz)
+      - [x] 右上角按钮z-index置顶(from tg by @lslqtz)
 
   - [ ] 将一些参数配置为可变
       - [ ] 配置 LocalStorage 记录参数捏
