@@ -8,7 +8,13 @@
 
 <!-- ![gif_preview.gif](https://github.com/KesaubeEire/PT_TorrentList_Masonry/blob/main/preview/gif_preview.gif?raw=true) -->
 
+[github 项目地址~](https://github.com/KesaubeEire/PT_TorrentList_Masonry)
+
 RT, 本油猴脚本(目前)专为 KamePT 打造, 让你顺畅划划划, 不必点翻页!
+
+欢迎为项目提 [issue](https://github.com/KesaubeEire/PT_TorrentList_Masonry/issues) 以及留言配置您想适配的站点~  
+
+相关事宜如果您在 tg 能找到我也可以直接联系我~
 
 <!-- ![gif_preview.gif](./preview/gif_preview.gif) -->
 
