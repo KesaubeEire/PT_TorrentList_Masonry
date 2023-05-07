@@ -70,3 +70,8 @@ RT, 本油猴脚本(目前)专为 KamePT 打造, 让你顺畅划划划, 不必�
       - [x] 收藏按钮样式调整 (from tg by @bacz)
       - [x] 图片链接多此一举了, 直接搬原链即可 (from tg by @Kyaru)
       - [ ] ...
+
+  - [ ] 站点状态对齐
+      - 最新为 MTeam.js
+      - [ ] KamePT.js 待更新 -> 等待 Kame 再次上线或在测试站更新
+      
