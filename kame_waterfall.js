@@ -768,7 +768,6 @@
   function PUT_TORRENT_INTO_MASONRY(torrent_list_Dom, waterfallNode, isFirst = true, masonry2) {
     const data = TORRENT_LIST_TO_JSON(torrent_list_Dom);
     console.log(`渲染行数: ${data.length}`);
-    console.log(data);
     RENDER_TORRENT_JSON_IN_MASONRY(waterfallNode, data, isFirst, masonry2);
   }
   function GET_CARD_GUTTER(containerDom, card_width) {
@@ -809,7 +808,6 @@
     };
   }
   function ADD_SITE_EXCLUSIVE_CSS() {
-    console.log(SITE[SITE_DOMAIN].CSS());
     return SITE[SITE_DOMAIN].CSS();
   }
   console.log("________PT-TorrentList-Masonry 已启动!________");
