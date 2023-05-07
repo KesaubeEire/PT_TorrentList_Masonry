@@ -4,8 +4,9 @@
 
 预览视频:  
 
-https://raw.githubusercontent.com/KesaubeEire/PT_TorrentList_Masonry/main/preview/_input.mov
+https://user-images.githubusercontent.com/20382002/236703818-427840b9-aaee-4133-9185-59244245cb7b.mov
 
+<!-- https://raw.githubusercontent.com/KesaubeEire/PT_TorrentList_Masonry/main/preview/_input.mov -->
 <!-- https://github.com/KesaubeEire/PT_TorrentList_Masonry/blob/main/preview/_input.mov?raw=true -->
 
 [github 项目地址~](https://github.com/KesaubeEire/PT_TorrentList_Masonry)
