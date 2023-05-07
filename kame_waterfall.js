@@ -2,7 +2,7 @@
 // @name            KamePT种子列表无限下拉瀑布流视图
 // @name:en         KamePT_waterfall_torrent
 // @namespace       https://github.com/KesaubeEire/PT_TorrentList_Masonry
-// @version         0.4.1
+// @version         0.4.3
 // @author          Kesa
 // @description     KamePT种子列表无限下拉瀑布流视图(描述不能与名称相同, 乐)
 // @description:en  KamePT torrent page waterfall view.
@@ -166,7 +166,7 @@
   
 
   <!-- 标签 Tags -->
-  <div class="card-line cl-tags">
+  <div class="cl-tags">
     ${raw_tags}
     <!-- <b>Tags:</b> ${tags.join(", ")} -->
   </div>
@@ -327,8 +327,53 @@
     TORRENT_LIST_TO_JSON: TORRENT_LIST_TO_JSON$1,
     RENDER_TORRENT_JSON_IN_MASONRY: RENDER_TORRENT_JSON_IN_MASONRY$1,
     /**如果站点有自定义的icon, 可以用自定义的 */
-    ICON: {}
+    ICON: {},
+    /**如果站点有必要设置自定义的css, 可以用自定义的 */
+    CSS: css,
+    /**如果站点有必要设置分类颜色, 可以用自定义的 */
+    CATEGORY: {
+      410: "#f52bcb",
+      429: "#f52bcb",
+      424: "#db55a9",
+      430: "#db55a9",
+      426: "#f77afa",
+      437: "#f77afa",
+      431: "#19a7ec",
+      432: "#19a7ec",
+      436: "#bb1e9a",
+      425: "#bb1e9a",
+      433: "#bb1e9a",
+      411: "#f49800",
+      412: "#f49800",
+      413: "#f49800",
+      440: "#f52bcb"
+    }
   };
+  function css(variable) {
+    return `  
+/* 卡片种类tag */
+.card-category{
+  padding: 2px 6px;
+  border-radius: 20px;
+  border: 1px;
+  background: black;
+  color: white;
+  font-weight: 600;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* 临时标签_热门 */
+.hot{
+  padding: 0 2px;
+  border-radius: 8px;
+  background: white;
+  margin: 2px;
+}
+/* 临时标签_新 */
+`;
+  }
   function TORRENT_LIST_TO_JSON$1(torrent_list_Dom, CARD2) {
     const rows = torrent_list_Dom.querySelectorAll("tr");
     const data = [];
@@ -337,6 +382,9 @@
       const category = categoryImg ? categoryImg.title : "";
       if (!category)
         return;
+      const categoryLinkDOM = categoryImg.parentNode;
+      const categoryLink = categoryLinkDOM.href;
+      const categoryNumber = categoryLink.slice(-3);
       const torrentIndex = CARD2.CARD_INDEX++;
       const torrentNameLink = row.querySelector(".torrentname a");
       const torrentName = torrentNameLink ? torrentNameLink.title.trim() : "";
@@ -346,31 +394,27 @@
       const torrentId = match ? parseInt(match[1]) : null;
       const imgDom = row.querySelector(".torrentname img");
       const _mouseOver = imgDom.getAttribute("onmouseover");
-      const _mouseOut = imgDom.getAttribute("onmouseout");
       const raw1 = _mouseOver ? _mouseOver.split(",")[2].toString() : "";
       const picLink = raw1 ? raw1.slice(raw1.indexOf("'") + 1, raw1.lastIndexOf("'")) : "/pic/nopic.jpg";
-      const place_at_the_top = row.querySelector(".torrentname img.sticky");
-      const pattMsg = place_at_the_top ? place_at_the_top.title : "";
-      const downloadLink = `download.php?id=${torrentId}`;
-      const collectLink = `javascript: bookmark(${torrentId},${torrentIndex});`;
-      const collectDOM = row.querySelector(".torrentname a[id^='bookmark']");
-      const collectState = collectDOM.children[0].alt;
-      const freeTypeImg = row.querySelector('img[class^="pro_"]');
-      const freeType = freeTypeImg ? "_" + freeTypeImg.alt.replace(/\s+/g, "") : "";
-      const freeRemainingTimeSpan = row.querySelector("font");
-      const freeRemainingTime = freeRemainingTimeSpan ? freeRemainingTimeSpan.innerText : "";
-      const tagSpans = row.querySelectorAll(".torrentname span");
-      const tagsDOM = Array.from(tagSpans);
-      let tags = tagSpans ? tagsDOM.map((span) => span.textContent.trim()) : [];
-      if (freeType != "") {
-        tags.shift();
-        tagsDOM.shift();
-      }
-      const raw_tags = tagsDOM.map((el) => el.outerHTML).join("");
       const desCell = row.querySelector(".torrentname td:nth-child(2)");
       const length = desCell.childNodes.length - 1;
       const desDom = desCell.childNodes[length];
       const description = desDom.nodeName == "#text" ? desDom.textContent.trim() : "";
+      const place_at_the_top = row.querySelectorAll(".torrentname img.sticky");
+      const pattMsg = place_at_the_top[0] ? place_at_the_top[0].title : "";
+      const tempTagDom = row.querySelectorAll(".torrentname font");
+      const freeTypeImg = row.querySelector('img[class^="pro_"]');
+      const freeType = freeTypeImg ? "_" + freeTypeImg.alt.replace(/\s+/g, "") : "";
+      const freeRemainingTimeSpan = row.querySelector(".torrentname td:nth-child(2) span");
+      const freeRemainingTime = freeRemainingTimeSpan ? freeRemainingTimeSpan.innerText : "";
+      const tagSpans = row.querySelectorAll(".torrentname img[class^='label_']");
+      const tagsDOM = Array.from(tagSpans);
+      let tags = tagSpans ? tagsDOM.map((el) => el.title.trim()) : [];
+      const raw_tags = tagsDOM.map((el) => el.outerHTML).join("&nbsp;");
+      const downloadLink = `download.php?id=${torrentId}`;
+      const collectLink = `javascript: bookmark(${torrentId},${torrentIndex});`;
+      const collectDOM = row.querySelector(".torrentname a[id^='bookmark']");
+      const collectState = collectDOM.children[0].alt;
       const commentsLink = row.querySelector("td.rowfollow:nth-child(3) a");
       const comments = commentsLink ? parseInt(commentsLink.textContent) : 0;
       const uploadDateSpan = row.querySelector("td:nth-child(4) span");
@@ -386,16 +430,19 @@
       const rowData = {
         torrentIndex,
         category,
+        categoryLink,
+        categoryNumber,
         torrent_name: torrentName,
         torrentLink,
         torrentId,
-        _mouseOver,
-        _mouseOut,
         picLink,
+        place_at_the_top,
         pattMsg,
         downloadLink,
         collectLink,
         collectState,
+        tempTagDom,
+        freeTypeImg,
         free_type: freeType,
         free_remaining_time: freeRemainingTime,
         raw_tags,
@@ -417,16 +464,19 @@
       const {
         torrentIndex,
         category,
+        categoryLink,
+        categoryNumber,
         torrent_name: torrentName,
         torrentLink,
         torrentId,
-        _mouseOver,
-        _mouseOut,
         picLink,
+        place_at_the_top,
         pattMsg,
         downloadLink,
         collectLink,
         collectState,
+        tempTagDom,
+        freeTypeImg,
         free_type: freeType,
         free_remaining_time: freeRemainingTime,
         raw_tags,
@@ -440,86 +490,98 @@
         snatched
       } = data;
       return `
-<!-- 分区类别 -->
+
 <div class="card-holder">
-<div class="card-category">
-  ${category}
-</div>
+  <!-- 分区类别 -->
+  <div
+    class="card-category"
+    href="${categoryLink}"
+    style="background: ${CONFIG.CATEGORY[categoryNumber]};"
+    >
+    ${category}    
+  </div>
 
-<!-- 标题 & 跳转详情链接 -->    
-<div class="card-title">
-  <a class="two-lines" src="${torrentLink}" href="${torrentLink}" target="_blank">
+  <!-- 标题 & 跳转详情链接 -->    
+  <div class="card-title">
+    <a class="two-lines" src="${torrentLink}" href="${torrentLink}" target="_blank">
+    ${tempTagDom ? Array.from(tempTagDom).map((e) => e.outerHTML).join("&nbsp;") : ""}
     <b>${torrentName}</b>
-  </a>
-</div>
-<div class="card-body">
-  <div class="card-image" onclick="window.open('${torrentLink}')">
-    <img  class="card-image--img nexus-lazy-load_Kesa" src="logo.png" data-src="${picLink}" alt="${torrentName}"/>
-    <div class="card-index">
-      ${torrentIndex + 1}
-    </div>  
+    </a>
   </div>
+  <div class="card-body">
+    <div class="card-image" onclick="window.open('${torrentLink}')">
+      <img  class="card-image--img nexus-lazy-load_Kesa" src="logo.png" data-src="${picLink}" alt="${torrentName}"/>
+      <div class="card-index">
+        ${torrentIndex + 1}
+      </div>  
+    </div>
 
-  <div class="card-alter">
-    <!-- 免费类型 & 免费剩余时间 -->
-    ${freeType ? `
-          <div class="free_flag ${freeType}">
-            <b>${freeType}: ${freeRemainingTime}_</b>
-          </div>
-          ` : ""}
-    <!-- 置顶等级 -->
-    ${pattMsg ? `<div><b>置顶等级:</b> ${pattMsg}</div>` : ""}
-  </div>
-
-  <!-- 副标题 -->
-  ${description ? `<a class="card-description" href='${torrentLink}'> ${description}</a>` : ""}
-  
-
-  <!-- 标签 Tags -->
-  <div class="card-line cl-tags">
-    ${raw_tags}
-    <!-- <b>Tags:</b> ${tags.join(", ")} -->
-  </div>
-
-
-  <div class="card-details">  
-    <div class="card-line">
-      <!-- 大小 -->
-      <div class="cl-center">
-        ${ICON2.SIZE}&nbsp;${size}
-      </div> 
-
-      <!-- 下载 -->
-      &nbsp;&nbsp;
-      <div class="cl-center">
-        ${ICON2.DOWNLOAD}&nbsp;
-        <b><a src="${downloadLink}" href="${downloadLink}">下载</a></b>
-      </div>
-
-      <!-- 收藏 -->
-      &nbsp;&nbsp;
-      <div class="cl-center">
-        <div class="btnCollet cl-center" id="tI_${torrentIndex}" onclick='COLLET_AND_ICON_CHANGE("${collectLink}", "tI_${torrentIndex}")'>
-        ${collectState == "Unbookmarked" ? ICON2.COLLET : ICON2.COLLETED}
-        &nbsp;<b>收藏</b>
+    <!-- 置顶 && 免费类型&剩余时间 -->      
+    ${freeType || pattMsg ? `
+      <div class="card-alter">          
+        <div class="top_and_free ${freeType}">
+          <!-- 置顶等级 -->
+          ${place_at_the_top ? Array.from(place_at_the_top).map((e) => e.outerHTML) : ""}
+          &nbsp;
+          <!-- 免费类型 & 免费剩余时间 -->
+          ${freeTypeImg ? freeTypeImg.outerHTML : ""}  <b>${freeRemainingTime ? freeRemainingTime : ""}</b>
         </div>
       </div>
+          ` : ``}
+
+    <!-- 置顶等级 -->
+    <!--${pattMsg ? `<div><b>置顶等级:</b> ${pattMsg}</div>` : ""}-->
+    
+    <!-- 副标题 -->
+    ${description ? `<a class="card-description" href='${torrentLink}'> ${description}</a>` : ""}
+    
+
+    <!-- 标签 Tags -->
+    <div class="cl-tags">
+      <!-- ${tempTagDom ? Array.from(tempTagDom).map((e) => e.outerHTML + "&nbsp;") : ""} -->
+      ${raw_tags}
+      <!-- <b>Tags:</b> ${tags.join("&nbsp;")} -->
     </div>
-    
-    <!-- 种子id, 默认不显示 -->
-    <!--<div class="card-line"><b>Torrent ID:</b> ${torrentId}</div> -->
-    
-    <!-- 上传时间 -->
-    <div class="card-line"><b>上传时间:</b> ${uploadDate}</div>
-    
-    <div class="card-line">
-      ${ICON2.COMMENT}&nbsp;<b>${comments}</b>&nbsp;&nbsp;
-      ${ICON2.SEEDERS}&nbsp;<b>${seeders}</b>&nbsp;&nbsp;
-      ${ICON2.LEECHERS}&nbsp;<b>${leechers}</b>&nbsp;&nbsp;
-      ${ICON2.SNATCHED}&nbsp;<b>${snatched}</b>
-    </div>    
+
+
+    <div class="card-details">  
+      <div class="card-line">
+        <!-- 大小 -->
+        <div class="cl-center">
+          ${ICON2.SIZE}&nbsp;${size}
+        </div> 
+
+        <!-- 下载 -->
+        &nbsp;&nbsp;
+        <div class="cl-center">
+          ${ICON2.DOWNLOAD}&nbsp;
+          <b><a src="${downloadLink}" href="${downloadLink}">下载</a></b>
+        </div>
+
+        <!-- 收藏 -->
+        &nbsp;&nbsp;
+        <div class="cl-center">
+          <div class="btnCollet cl-center" id="tI_${torrentIndex}" onclick='COLLET_AND_ICON_CHANGE("${collectLink}", "tI_${torrentIndex}")'>
+          ${collectState == "Unbookmarked" ? ICON2.COLLET : ICON2.COLLETED}
+          &nbsp;<b>收藏</b>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 种子id, 默认不显示 -->
+      <!--<div class="card-line"><b>Torrent ID:</b> ${torrentId}</div> -->
+      
+      <!-- 上传时间 -->
+      <div class="card-line"><b>上传时间:</b> ${uploadDate}</div>
+      
+      <div class="card-line">
+        ${ICON2.COMMENT}&nbsp;<b>${comments}</b>&nbsp;&nbsp;
+        ${ICON2.SEEDERS}&nbsp;<b>${seeders}</b>&nbsp;&nbsp;
+        ${ICON2.LEECHERS}&nbsp;<b>${leechers}</b>&nbsp;&nbsp;
+        ${ICON2.SNATCHED}&nbsp;<b>${snatched}</b>
+      </div>    
+    </div>
   </div>
-</div>
 </div>`;
     };
     for (const rowData of torrent_json) {
@@ -706,6 +768,7 @@
   function PUT_TORRENT_INTO_MASONRY(torrent_list_Dom, waterfallNode, isFirst = true, masonry2) {
     const data = TORRENT_LIST_TO_JSON(torrent_list_Dom);
     console.log(`渲染行数: ${data.length}`);
+    console.log(data);
     RENDER_TORRENT_JSON_IN_MASONRY(waterfallNode, data, isFirst, masonry2);
   }
   function GET_CARD_GUTTER(containerDom, card_width) {
@@ -744,6 +807,10 @@
         func.apply(context, args);
       }, delay);
     };
+  }
+  function ADD_SITE_EXCLUSIVE_CSS() {
+    console.log(SITE[SITE_DOMAIN].CSS());
+    return SITE[SITE_DOMAIN].CSS();
   }
   console.log("________PT-TorrentList-Masonry 已启动!________");
   const _ORIGIN_TL_Node = GET_TORRENT_LIST_DOM_FROM_DOMAIN();
@@ -832,7 +899,7 @@
     });
     document.body.appendChild(switchModeBtn);
     PUT_TORRENT_INTO_MASONRY(_ORIGIN_TL_Node, waterfallNode, true, masonry2);
-    const css = `
+    const css2 = `
 
 /* 瀑布流主容器 */
 div.waterfall{
@@ -878,7 +945,7 @@ button#btnSwitchMode {
 .card {
   width: ${CARD.CARD_WIDTH}px;
   border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 5px;
+  border-radius: 10px;
   background-color: ${themeColor};
   /* box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3); */
   /* margin: 10px; */
@@ -893,6 +960,12 @@ button#btnSwitchMode {
   
 }
 
+/* 卡片标题 */
+.card-title{
+  padding: 2px 0;
+}
+
+/* 卡片内部容器 */
 .card-holder{
   background-color: rgba(255, 255, 255, 0.5);
   background: linear-gradient(to bottom, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0));
@@ -906,6 +979,8 @@ button#btnSwitchMode {
   display: flex;
   justify-content: space-evenly;
   align-items: center;
+
+  height: 20px;
 }
 
 /* 卡片标题: 默认两行 */
@@ -945,6 +1020,8 @@ button#btnSwitchMode {
   justify-content: center;
   align-items: center;
   flex-direction: column;
+
+  padding-top: 2px;
 }
 
 /* 卡片图像div */
@@ -963,23 +1040,36 @@ button#btnSwitchMode {
 /* 卡片可选信息 */
 .card-alter{
   text-align: center;
+  height: 20px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 
-/* 免费类型&剩余时间 */
-.free_flag{
+/* 置顶 && 免费类型&剩余时间 */
+.top_and_free{
   padding: 2px;
   border-radius: 4px;
   margin-bottom: 2px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  line-height: 11px;
+  height: 11px;
+  font-size: 10px;
 }
 ._Free{
   color: blue;
-  background-color: #00e6
+  /* background-color: #00e6 */
 }
 
 ._2XFree{
   color: green;
-  background-color: #0e0
+  /* background-color: #0e0 */
 }
 
 /* 卡片索引 */
@@ -1030,7 +1120,7 @@ button#btnSwitchMode {
 }
 `;
     const style = document.createElement("style");
-    style.textContent = css;
+    style.textContent = css2 + ADD_SITE_EXCLUSIVE_CSS();
     document.head.appendChild(style);
     const script = document.createElement("script");
     script.src = "https://cdnjs.cloudflare.com/ajax/libs/masonry/4.2.2/masonry.pkgd.min.js";
