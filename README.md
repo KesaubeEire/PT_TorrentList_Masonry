@@ -3,7 +3,10 @@
 ![gif_preview.gif](https://github.com/KesaubeEire/PT_TorrentList_Masonry/blob/main/preview/gif_preview.gif?raw=true)
 
 预览视频:  
-https://github.com/KesaubeEire/PT_TorrentList_Masonry/blob/main/preview/_input.mov?raw=true
+
+https://raw.githubusercontent.com/KesaubeEire/PT_TorrentList_Masonry/main/preview/_input.mov
+
+<!-- https://github.com/KesaubeEire/PT_TorrentList_Masonry/blob/main/preview/_input.mov?raw=true -->
 
 [github 项目地址~](https://github.com/KesaubeEire/PT_TorrentList_Masonry)
 
