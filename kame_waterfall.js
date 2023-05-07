@@ -2,7 +2,7 @@
 // @name            KamePT种子列表无限下拉瀑布流视图
 // @name:en         KamePT_waterfall_torrent
 // @namespace       https://github.com/KesaubeEire/PT_TorrentList_Masonry
-// @version         0.4.3
+// @version         0.4.4
 // @author          Kesa
 // @description     KamePT种子列表无限下拉瀑布流视图(描述不能与名称相同, 乐)
 // @description:en  KamePT torrent page waterfall view.
@@ -332,28 +332,85 @@
     CSS: css,
     /**如果站点有必要设置分类颜色, 可以用自定义的 */
     CATEGORY: {
+      // 成人分类
       410: "#f52bcb",
+      // 有码 HD
       429: "#f52bcb",
+      // 无码 HD
       424: "#db55a9",
+      // 有码 Xvid
       430: "#db55a9",
-      426: "#f77afa",
+      // 无码 Xvid
       437: "#f77afa",
+      // 有码 DVD
+      426: "#f77afa",
+      // 无码 DVD
       431: "#19a7ec",
+      // 有码 BluRay
       432: "#19a7ec",
+      // 无码 BluRay
+      440: "#f52bcb",
+      // GAY
       436: "#bb1e9a",
+      // 0 day
       425: "#bb1e9a",
+      // 写真 video
       433: "#bb1e9a",
+      // 写真 pic
       411: "#f49800",
+      // H-Game
       412: "#f49800",
+      // H-Anime
       413: "#f49800",
-      440: "#f52bcb"
+      // H-Comic
+      // 综合分类
+      401: "#c74854",
+      // Movie SD
+      419: "#c01a20",
+      // Movie HD
+      420: "#c74854",
+      // Movie DVD    
+      421: "#00a0e9",
+      // Movie BluRay
+      439: "#1b2a51",
+      // Movie Remux
+      403: "#c74854",
+      // TV SD
+      402: "#276fb8",
+      // TV HD
+      435: "#4dbebd ",
+      // TV DVD
+      438: "#1897d6",
+      // TV BluRay
+      404: "#23ac38",
+      // 纪录教育
+      405: "#996c34",
+      // Anime
+      407: "#23ac38",
+      // Sport
+      422: "#f39800",
+      // Software
+      423: "#f39800",
+      // Game
+      427: "#f39800",
+      // EBook
+      409: "#996c34",
+      // Other
+      // 音乐分类
+      406: "#8a57a1",
+      // MV
+      408: "#8a57a1",
+      // Music AAC/ALAC
+      434: "#8a57a1"
+      // Music 无损
     }
   };
   function css(variable) {
     return `  
 /* 卡片种类tag */
 .card-category{
-  padding: 2px 6px;
+  height: 24px;
+  padding: 0 6px;
   border-radius: 20px;
   border: 1px;
   background: black;
@@ -362,6 +419,19 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+
+  display: flex;
+  align-items: center;
+}
+
+/* 卡片种类tag预览图 */
+.card-category-img
+{
+  height: 18px;
+
+  background-size: 100% 141%;
+  background-position: center top;
+  padding-left: 5%;
 }
 
 /* 临时标签_热门 */
@@ -385,6 +455,8 @@
       const categoryLinkDOM = categoryImg.parentNode;
       const categoryLink = categoryLinkDOM.href;
       const categoryNumber = categoryLink.slice(-3);
+      const _categoryImg = categoryImg.cloneNode(true);
+      _categoryImg.className = "card-category-img";
       const torrentIndex = CARD2.CARD_INDEX++;
       const torrentNameLink = row.querySelector(".torrentname a");
       const torrentName = torrentNameLink ? torrentNameLink.title.trim() : "";
@@ -429,6 +501,7 @@
       const snatched = snatchedLink ? parseInt(snatchedLink.textContent) : 0;
       const rowData = {
         torrentIndex,
+        _categoryImg,
         category,
         categoryLink,
         categoryNumber,
@@ -463,6 +536,7 @@
     const cardTemplate = (data) => {
       const {
         torrentIndex,
+        _categoryImg,
         category,
         categoryLink,
         categoryNumber,
@@ -498,6 +572,7 @@
     href="${categoryLink}"
     style="background: ${CONFIG.CATEGORY[categoryNumber]};"
     >
+    ${_categoryImg.outerHTML}
     ${category}    
   </div>
 
@@ -896,6 +971,16 @@
       }
     });
     document.body.appendChild(switchModeBtn);
+    const sortMasonryBtn = document.createElement("button");
+    sortMasonryBtn.classList.add("debug");
+    sortMasonryBtn.setAttribute("id", "sort_masonry");
+    sortMasonryBtn.innerText = "整理布局";
+    sortMasonryBtn.style.zIndex = 10004;
+    sortMasonryBtn.addEventListener("click", function() {
+      if (masonry2)
+        masonry2.layout();
+    });
+    document.body.appendChild(sortMasonryBtn);
     PUT_TORRENT_INTO_MASONRY(_ORIGIN_TL_Node, waterfallNode, true, masonry2);
     const css2 = `
 
@@ -929,14 +1014,19 @@ button#toggle_oldTable {
   top: 10px;
 }
 
-/* 调试按键2: Masonry 重新排列 */
+/* 调试按键2: Masonry 切换卡片宽度 */
 button#btnReLayout {
   top: 40px;
 }  
 
-/* 调试按键3: Masonry 重新排列 */
+/* 调试按键3: 切换下一页加载方式 */
 button#btnSwitchMode {
   top: 70px;
+}
+
+/* 调试按键4: Masonry 重新排列 */
+button#sort_masonry {
+  top: 100px;
 }
 
 /* 卡片 */
