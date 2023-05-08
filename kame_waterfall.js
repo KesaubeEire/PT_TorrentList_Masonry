@@ -1,11 +1,11 @@
 // ==UserScript==
-// @name            KamePT种子列表无限下拉瀑布流视图
-// @name:en         KamePT_waterfall_torrent
+// @name            PT种子列表无限下拉瀑布流视图
+// @name:en         PT_waterfall_torrent
 // @namespace       https://github.com/KesaubeEire/PT_TorrentList_Masonry
 // @version         0.4.4
 // @author          Kesa
-// @description     KamePT种子列表无限下拉瀑布流视图(描述不能与名称相同, 乐)
-// @description:en  KamePT torrent page waterfall view.
+// @description     PT种子列表无限下拉瀑布流视图(描述不能与名称相同, 乐)
+// @description:en  PT torrent page waterfall view.
 // @license         MIT
 // @icon            https://kamept.com/favicon.ico
 // @match           https://kamept.com/*
