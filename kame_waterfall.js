@@ -2,7 +2,7 @@
 // @name            PT种子列表无限下拉瀑布流视图
 // @name:en         PT_waterfall_torrent
 // @namespace       https://github.com/KesaubeEire/PT_TorrentList_Masonry
-// @version         0.4.4
+// @version         0.4.7
 // @author          Kesa
 // @description     PT种子列表无限下拉瀑布流视图(描述不能与名称相同, 乐)
 // @description:en  PT torrent page waterfall view.
@@ -25,8 +25,17 @@
     TORRENT_LIST_TO_JSON: TORRENT_LIST_TO_JSON$2,
     RENDER_TORRENT_JSON_IN_MASONRY: RENDER_TORRENT_JSON_IN_MASONRY$2,
     /**如果站点有自定义的icon, 可以用自定义的 */
-    ICON: {}
+    ICON: {},
+    /**如果站点有必要设置自定义的css, 可以用自定义的 */
+    CSS: css$1,
+    /**如果站点有必要设置分类颜色, 可以用自定义的 */
+    CATEGORY: {}
   };
+  function css$1(variable) {
+    return ` 
+
+`;
+  }
   function TORRENT_LIST_TO_JSON$2(torrent_list_Dom, CARD2) {
     const rows = torrent_list_Dom.querySelectorAll("tr");
     const data = [];
@@ -35,6 +44,11 @@
       const category = categoryImg ? categoryImg.alt : "";
       if (!category)
         return;
+      const categoryLinkDOM = categoryImg.parentNode;
+      const categoryLink = categoryLinkDOM.href;
+      const categoryNumber = categoryLink.slice(-3);
+      const _categoryImg = categoryImg.cloneNode(true);
+      _categoryImg.className = "card-category-img";
       const torrentIndex = CARD2.CARD_INDEX++;
       const torrentNameLink = row.querySelector(".torrentname a");
       const torrentName = torrentNameLink ? torrentNameLink.textContent.trim() : "";
@@ -43,28 +57,29 @@
       const match = torrentLink.match(pattern);
       const torrentId = match ? parseInt(match[1]) : null;
       const picLink = row.querySelector(".torrentname img").getAttribute("data-src");
-      const place_at_the_top = row.querySelector(".torrentname img.sticky");
-      const pattMsg = place_at_the_top ? place_at_the_top.title : "";
-      const downloadLink = `download.php?id=${torrentId}`;
-      const collectLink = `javascript: bookmark(${torrentId},${torrentIndex});`;
-      const collectDOM = row.querySelector(".torrentname a[id^='bookmark']");
-      const collectState = collectDOM.children[0].alt;
-      const freeTypeImg = row.querySelector('img[class^="pro_"]');
-      const freeType = freeTypeImg ? "_" + freeTypeImg.alt.replace(/\s+/g, "") : "";
-      const freeRemainingTimeSpan = row.querySelector("font");
-      const freeRemainingTime = freeRemainingTimeSpan ? freeRemainingTimeSpan.innerText : "";
-      const tagSpans = row.querySelectorAll(".torrentname span");
-      const tagsDOM = Array.from(tagSpans);
-      let tags = tagSpans ? tagsDOM.map((span) => span.textContent.trim()) : [];
-      if (freeType != "") {
-        tags.shift();
-        tagsDOM.shift();
-      }
-      const raw_tags = tagsDOM.map((el) => el.outerHTML).join("");
       const desCell = row.querySelector(".torrentname td:nth-child(2)");
       const length = desCell.childNodes.length - 1;
       const desDom = desCell.childNodes[length];
       const description = desDom.nodeName == "#text" ? desDom.textContent.trim() : "";
+      const place_at_the_top = row.querySelectorAll(".torrentname img.sticky");
+      const pattMsg = place_at_the_top[0] ? place_at_the_top[0].title : "";
+      const tempTagDom = row.querySelectorAll(".torrentname font");
+      const freeTypeImg = row.querySelector('img[class^="pro_"]');
+      const freeType = freeTypeImg ? "_" + freeTypeImg.alt.replace(/\s+/g, "") : "";
+      const freeRemainingTimeSpan = freeType ? Array.from(tempTagDom)[tempTagDom.length - 1] : "";
+      const freeRemainingTime = freeRemainingTimeSpan ? freeRemainingTimeSpan.innerText : "";
+      const tagSpans = row.querySelectorAll(".torrentname span");
+      const tagsDOM = Array.from(tagSpans);
+      let tags = tagSpans ? tagsDOM.map((span) => span.textContent.trim()) : [];
+      if (freeRemainingTime != "") {
+        tags.shift();
+        tagsDOM.shift();
+      }
+      const raw_tags = tagsDOM.map((el) => el.outerHTML).join("");
+      const downloadLink = `download.php?id=${torrentId}`;
+      const collectLink = `javascript: bookmark(${torrentId},${torrentIndex});`;
+      const collectDOM = row.querySelector(".torrentname a[id^='bookmark']");
+      const collectState = collectDOM.children[0].alt;
       const commentsLink = row.querySelector("td.rowfollow:nth-child(3) a");
       const comments = commentsLink ? parseInt(commentsLink.textContent) : 0;
       const uploadDateSpan = row.querySelector("td:nth-child(4) span");
@@ -79,22 +94,29 @@
       const snatched = snatchedLink ? parseInt(snatchedLink.textContent) : 0;
       const rowData = {
         torrentIndex,
+        _categoryImg,
         category,
+        categoryLink,
+        categoryNumber,
         torrent_name: torrentName,
         torrentLink,
         torrentId,
         picLink,
+        place_at_the_top,
         pattMsg,
         downloadLink,
         collectLink,
         collectState,
+        tempTagDom,
+        freeTypeImg,
         free_type: freeType,
         free_remaining_time: freeRemainingTime,
         raw_tags,
+        tagsDOM,
         tags,
         description,
-        comments,
         upload_date: uploadDate,
+        comments,
         size,
         seeders,
         leechers,
@@ -108,108 +130,136 @@
     const cardTemplate = (data) => {
       const {
         torrentIndex,
+        _categoryImg,
         category,
+        categoryLink,
+        categoryNumber,
         torrent_name: torrentName,
         torrentLink,
         torrentId,
         picLink,
+        place_at_the_top,
         pattMsg,
         downloadLink,
         collectLink,
         collectState,
+        tempTagDom,
+        freeTypeImg,
         free_type: freeType,
         free_remaining_time: freeRemainingTime,
         raw_tags,
+        tagsDOM,
         tags,
         description,
-        comments,
         upload_date: uploadDate,
+        comments,
         size,
         seeders,
         leechers,
         snatched
       } = data;
       return `
-<!-- 分区类别 -->
 <div class="card-holder">
-<div class="card-category">
-  ${category}
-</div>
-
-<!-- 标题 & 跳转详情链接 -->    
-<div class="card-title">
-  <a class="two-lines" src="${torrentLink}" href="${torrentLink}" target="_blank">
-    <b>${torrentName}</b>
-  </a>
-</div>
-<div class="card-body">
-  <div class="card-image" onclick="window.open('${torrentLink}')">
-    <img class="card-image--img nexus-lazy-load_Kesa" src="pic/misc/spinner.svg" data-src="${picLink}"  alt="${torrentName}" />
-    <div class="card-index">
-      ${torrentIndex + 1}
-    </div>  
+  <!-- 分区类别 -->
+  <div
+    class="card-category"
+    href="${categoryLink}"
+    <!-- TODO: 颜色这里和龟龟商量怎么搞分类的颜色捏 -->    
+    <!-- style="background: ${CONFIG$1.CATEGORY[categoryNumber]};" -->
+    >
+    <!-- TODO: 图片这里先注释了, 和龟龟商量捏 -->    
+    <!-- ${_categoryImg.outerHTML} -->
+    ${category}    
   </div>
 
-  <div class="card-alter">
-    <!-- 免费类型 & 免费剩余时间 -->
-    ${freeType ? `
-          <div class="free_flag ${freeType}">
-            <b>${freeType}: ${freeRemainingTime}_</b>
-          </div>
-          ` : ""}
-    <!-- 置顶等级 -->
-    ${pattMsg ? `<div><b>置顶等级:</b> ${pattMsg}</div>` : ""}
+  <!-- 标题 & 跳转详情链接 -->    
+  <div class="card-title">
+    <a class="two-lines" src="${torrentLink}" href="${torrentLink}" target="_blank">
+      ${tempTagDom ? Array.from(tempTagDom).map((e) => e.outerHTML).join("&nbsp;") : ""}
+      <b>${torrentName}</b>
+    </a>
   </div>
 
-  <!-- 副标题 -->
-  ${description ? `<a class="card-description" href='${torrentLink}'> ${description}</a>` : ""}
-  
+  <!-- 卡片其他信息 -->    
+  <div class="card-body">
+    <div class="card-image" onclick="window.open('${torrentLink}')">
+      <!-- <img class="card-image--img nexus-lazy-load_Kesa" src="pic/misc/spinner.svg" data-src="${picLink}"  alt="${torrentName}" /> -->
+      <!-- NOTE: 加载图片这里换成了logo, 和 MT 一样了捏 -->    
+      <img class="card-image--img nexus-lazy-load_Kesa" src="pic/logo2_100.png" data-src="${picLink}"  alt="${torrentName}" />
+      <div class="card-index">
+        ${torrentIndex + 1}
+      </div>  
+    </div>
 
-  <!-- 标签 Tags -->
-  <div class="cl-tags">
-    ${raw_tags}
-    <!-- <b>Tags:</b> ${tags.join(", ")} -->
-  </div>
+    <!-- 置顶 && 免费类型&剩余时间 -->      
+    ${freeType || pattMsg ? `
+      <div class="card-alter">          
+        <div class="top_and_free ${freeType}">
+          <!-- 置顶等级 -->
+          ${place_at_the_top.length != 0 ? Array.from(place_at_the_top).map((e) => e.outerHTML) + "&nbsp;" : ""}
 
-
-  <div class="card-details">  
-    <div class="card-line">
-      <!-- 大小 -->
-      <div class="cl-center">
-        ${ICON2.SIZE}&nbsp;${size}
-      </div> 
-
-      <!-- 下载 -->
-      &nbsp;&nbsp;
-      <div class="cl-center">
-        ${ICON2.DOWNLOAD}&nbsp;
-        <b><a src="${downloadLink}" href="${downloadLink}">下载</a></b>
-      </div>
-
-      <!-- 收藏 -->
-      &nbsp;&nbsp;
-      <div class="cl-center">
-        <div class="btnCollet cl-center" id="tI_${torrentIndex}" onclick='COLLET_AND_ICON_CHANGE("${collectLink}", "tI_${torrentIndex}")'>
-        ${collectState == "Unbookmarked" ? ICON2.COLLET : ICON2.COLLETED}
-        &nbsp;<b>收藏</b>
+          <!-- 免费类型 & 免费剩余时间 -->
+          ${freeTypeImg ? freeTypeImg.outerHTML : ""}  <b>${freeRemainingTime ? freeRemainingTime : ""}</b>
         </div>
       </div>
+          ` : ``}
+
+    <!-- 置顶等级 -->
+    <!--${pattMsg ? `<div><b>置顶等级:</b> ${pattMsg}</div>` : ""}-->
+
+    <!-- 副标题 -->
+    ${description ? `<a class="card-description" href='${torrentLink}'> ${description}</a>` : ""}
+    
+
+    <!-- 标签 Tags -->
+    <div class="cl-tags">
+      ${tagsDOM.map((el) => {
+      const _tag = document.createElement("div");
+      _tag.innerHTML = el.outerHTML;
+      return _tag.outerHTML;
+    }).join("")}
+      <!-- <b>Tags:</b> ${tags.join(", ")} -->
     </div>
-    
-    <!-- 种子id, 默认不显示 -->
-    <!--<div class="card-line"><b>Torrent ID:</b> ${torrentId}</div> -->
-    
-    <!-- 上传时间 -->
-    <div class="card-line"><b>上传时间:</b> ${uploadDate}</div>
-    
-    <div class="card-line">
-      ${ICON2.COMMENT}&nbsp;<b>${comments}</b>&nbsp;&nbsp;
-      ${ICON2.SEEDERS}&nbsp;<b>${seeders}</b>&nbsp;&nbsp;
-      ${ICON2.LEECHERS}&nbsp;<b>${leechers}</b>&nbsp;&nbsp;
-      ${ICON2.SNATCHED}&nbsp;<b>${snatched}</b>
-    </div>    
+
+
+    <div class="card-details">  
+      <div class="card-line">
+        <!-- 大小 -->
+        <div class="cl-center">
+          ${ICON2.SIZE}&nbsp;${size}
+        </div> 
+
+        <!-- 下载 -->
+        &nbsp;&nbsp;
+        <div class="cl-center">
+          ${ICON2.DOWNLOAD}&nbsp;
+          <b><a src="${downloadLink}" href="${downloadLink}">下载</a></b>
+        </div>
+
+        <!-- 收藏 -->
+        &nbsp;&nbsp;
+        <div class="cl-center">
+          <div class="btnCollet cl-center" id="tI_${torrentIndex}" onclick='COLLET_AND_ICON_CHANGE("${collectLink}", "tI_${torrentIndex}")'>
+            ${collectState == "Unbookmarked" ? ICON2.COLLET : ICON2.COLLETED}
+            &nbsp;<b>收藏</b>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 种子id, 默认不显示 -->
+      <!--<div class="card-line"><b>Torrent ID:</b> ${torrentId}</div> -->
+      
+      <!-- 上传时间 -->
+      <div class="card-line"><b>上传时间:</b> ${uploadDate}</div>
+      
+      <div class="card-line">
+        ${ICON2.COMMENT}&nbsp;<b>${comments}</b>&nbsp;&nbsp;
+        ${ICON2.SEEDERS}&nbsp;<b>${seeders}</b>&nbsp;&nbsp;
+        ${ICON2.LEECHERS}&nbsp;<b>${leechers}</b>&nbsp;&nbsp;
+        ${ICON2.SNATCHED}&nbsp;<b>${snatched}</b>
+      </div>    
+    </div>
   </div>
-</div>
 </div>`;
     };
     for (const rowData of torrent_json) {
@@ -433,15 +483,6 @@
   background-position: center top;
   padding-left: 5%;
 }
-
-/* 临时标签_热门 */
-.hot{
-  padding: 0 2px;
-  border-radius: 8px;
-  background: white;
-  margin: 2px;
-}
-/* 临时标签_新 */
 `;
   }
   function TORRENT_LIST_TO_JSON$1(torrent_list_Dom, CARD2) {
@@ -519,6 +560,7 @@
         free_type: freeType,
         free_remaining_time: freeRemainingTime,
         raw_tags,
+        tagsDOM,
         tags,
         description,
         comments,
@@ -554,6 +596,7 @@
         free_type: freeType,
         free_remaining_time: freeRemainingTime,
         raw_tags,
+        tagsDOM,
         tags,
         description,
         comments,
@@ -579,10 +622,12 @@
   <!-- 标题 & 跳转详情链接 -->    
   <div class="card-title">
     <a class="two-lines" src="${torrentLink}" href="${torrentLink}" target="_blank">
-    ${tempTagDom ? Array.from(tempTagDom).map((e) => e.outerHTML).join("&nbsp;") : ""}
-    <b>${torrentName}</b>
+      ${tempTagDom ? Array.from(tempTagDom).map((e) => e.outerHTML).join("&nbsp;") : ""}
+      <b>${torrentName}</b>
     </a>
   </div>
+
+  <!-- 卡片其他信息 -->    
   <div class="card-body">
     <div class="card-image" onclick="window.open('${torrentLink}')">
       <img  class="card-image--img nexus-lazy-load_Kesa" src="logo.png" data-src="${picLink}" alt="${torrentName}"/>
@@ -596,8 +641,8 @@
       <div class="card-alter">          
         <div class="top_and_free ${freeType}">
           <!-- 置顶等级 -->
-          ${place_at_the_top ? Array.from(place_at_the_top).map((e) => e.outerHTML) : ""}
-          &nbsp;
+          ${place_at_the_top.length != 0 ? Array.from(place_at_the_top).map((e) => e.outerHTML) + "&nbsp;" : ""}
+
           <!-- 免费类型 & 免费剩余时间 -->
           ${freeTypeImg ? freeTypeImg.outerHTML : ""}  <b>${freeRemainingTime ? freeRemainingTime : ""}</b>
         </div>
@@ -606,15 +651,19 @@
 
     <!-- 置顶等级 -->
     <!--${pattMsg ? `<div><b>置顶等级:</b> ${pattMsg}</div>` : ""}-->
-    
+
     <!-- 副标题 -->
-    ${description ? `<a class="card-description" href='${torrentLink}'> ${description}</a>` : ""}
+    ${description ? `<div class="card-description"><a href='${torrentLink}'> ${description}</a></div>` : ""}
     
 
     <!-- 标签 Tags -->
     <div class="cl-tags">
       <!-- ${tempTagDom ? Array.from(tempTagDom).map((e) => e.outerHTML + "&nbsp;") : ""} -->
-      ${raw_tags}
+      ${tagsDOM.map((el) => {
+      const _tag = document.createElement("div");
+      _tag.innerHTML = el.outerHTML;
+      return _tag.outerHTML;
+    }).join("")}
       <!-- <b>Tags:</b> ${tags.join("&nbsp;")} -->
     </div>
 
@@ -637,8 +686,8 @@
         &nbsp;&nbsp;
         <div class="cl-center">
           <div class="btnCollet cl-center" id="tI_${torrentIndex}" onclick='COLLET_AND_ICON_CHANGE("${collectLink}", "tI_${torrentIndex}")'>
-          ${collectState == "Unbookmarked" ? ICON2.COLLET : ICON2.COLLETED}
-          &nbsp;<b>收藏</b>
+            ${collectState == "Unbookmarked" ? ICON2.COLLET : ICON2.COLLETED}
+            &nbsp;<b>收藏</b>
           </div>
         </div>
       </div>
@@ -883,7 +932,10 @@
     };
   }
   function ADD_SITE_EXCLUSIVE_CSS() {
-    return SITE[SITE_DOMAIN].CSS();
+    if (SITE[SITE_DOMAIN].CSS)
+      return SITE[SITE_DOMAIN].CSS();
+    else
+      console.log("本站点无自定义CSS~");
   }
   console.log("________PT-TorrentList-Masonry 已启动!________");
   const _ORIGIN_TL_Node = GET_TORRENT_LIST_DOM_FROM_DOMAIN();
@@ -900,6 +952,8 @@
         else {
           console.log("按钮模式~");
         }
+        if (masonry2)
+          masonry2.layout();
       }
     };
     let masonry2;
@@ -974,7 +1028,7 @@
     const sortMasonryBtn = document.createElement("button");
     sortMasonryBtn.classList.add("debug");
     sortMasonryBtn.setAttribute("id", "sort_masonry");
-    sortMasonryBtn.innerText = "整理布局";
+    sortMasonryBtn.innerText = "手动整理布局";
     sortMasonryBtn.style.zIndex = 10004;
     sortMasonryBtn.addEventListener("click", function() {
       if (masonry2)
@@ -1098,8 +1152,12 @@ button#sort_masonry {
   display: flex;
   justify-content: left;
   align-items: center;
+  flex-wrap: wrap;
+
+  gap: 2px;
   
   transform: translateX(4px);
+  
 }
 
 /* 卡片简介总容器 */
@@ -1161,6 +1219,12 @@ button#sort_masonry {
 }
 
 /* 卡片索引 */
+.card-description{
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+/* 卡片索引 */
 .card-index{
   position: absolute;
   top: 0;
@@ -1205,6 +1269,21 @@ button#sort_masonry {
   z-index: 20000;
   position: absolute;
   display: none;
+}
+
+/* 临时标签_热门 */
+.hot{
+  padding: 0 2px;
+  border-radius: 8px;
+  background: white;
+  margin: 2px;
+}
+/* 临时标签_新 */
+.new{
+  padding: 0 2px;
+  border-radius: 8px;
+  background: white;
+  margin: 2px;
 }
 `;
     const style = document.createElement("style");
