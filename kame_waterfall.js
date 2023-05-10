@@ -2,7 +2,7 @@
 // @name            PT种子列表无限下拉瀑布流视图
 // @name:en         PT_waterfall_torrent
 // @namespace       https://github.com/KesaubeEire/PT_TorrentList_Masonry
-// @version         0.4.7
+// @version         0.4.9
 // @author          Kesa
 // @description     PT种子列表无限下拉瀑布流视图(描述不能与名称相同, 乐)
 // @description:en  PT torrent page waterfall view.
@@ -14,6 +14,7 @@
 // @exclude         */index.php*
 // @exclude         */forums.php*
 // @exclude         */viewrequests.php*
+// @exclude         */seek.php*
 // @grant           none
 // ==/UserScript==
 
@@ -279,98 +280,6 @@
         masonry2.appended(card);
       }
     }
-    NEXUS_TOOLS$1();
-  }
-  function NEXUS_TOOLS$1() {
-    jQuery(document).ready(function() {
-      function getImgPosition(e, imgEle2) {
-        let imgWidth = imgEle2.prop("naturalWidth");
-        let imgHeight = imgEle2.prop("naturalHeight");
-        let ratio = imgWidth / imgHeight;
-        let offsetX = 10;
-        let offsetY = 10;
-        let width = window.innerWidth - e.clientX;
-        let height = window.innerHeight - e.clientY;
-        let changeOffsetY = 0;
-        let changeOffsetX = false;
-        if (e.clientX > window.innerWidth / 2 && e.clientX + imgWidth > window.innerWidth) {
-          changeOffsetX = true;
-          width = e.clientX;
-        }
-        if (e.clientY > window.innerHeight / 2) {
-          if (e.clientY + imgHeight / 2 > window.innerHeight) {
-            changeOffsetY = 1;
-            height = e.clientY;
-          } else if (e.clientY + imgHeight > window.innerHeight) {
-            changeOffsetY = 2;
-            height = e.clientY;
-          }
-        }
-        `innerWidth: ${window.innerWidth}, innerHeight: ${window.innerHeight}, pageX: ${e.pageX}, pageY: ${e.pageY}, imgWidth: ${imgWidth}, imgHeight: ${imgHeight}, width: ${width}, height: ${height}, offsetX: ${offsetX}, offsetY: ${offsetY}, changeOffsetX: ${changeOffsetX}, changeOffsetY: ${changeOffsetY}`;
-        if (imgWidth > width) {
-          imgWidth = width;
-          imgHeight = imgWidth / ratio;
-        }
-        if (imgHeight > height) {
-          imgHeight = height;
-          imgWidth = imgHeight * ratio;
-        }
-        if (changeOffsetX) {
-          offsetX = -(e.clientX - width + 10);
-        }
-        if (changeOffsetY == 1) {
-          offsetY = -(imgHeight - (window.innerHeight - e.clientY));
-        } else if (changeOffsetY == 2) {
-          offsetY = -imgHeight / 2;
-        }
-        return { imgWidth, imgHeight, offsetX, offsetY };
-      }
-      function getPosition(e, position) {
-        return {
-          left: e.pageX + position.offsetX,
-          top: e.pageY + position.offsetY,
-          width: position.imgWidth,
-          height: position.imgHeight
-        };
-      }
-      const previewEle = jQuery("#nexus-preview");
-      let imgEle;
-      const selector = "img.preview_Kesa";
-      let imgPosition;
-      jQuery("body").on("mouseover", selector, function(e) {
-        imgEle = jQuery(this);
-        imgPosition = getImgPosition(e, imgEle);
-        let position = getPosition(e, imgPosition);
-        let src = imgEle.attr("src");
-        if (src) {
-          previewEle.attr("src", src).css(position).fadeIn("fast");
-        }
-      }).on("mouseout", selector, function(e) {
-        previewEle.hide();
-      }).on("mousemove", selector, function(e) {
-        let position = getPosition(e, imgPosition);
-        previewEle.css(position);
-      });
-      if ("IntersectionObserver" in window) {
-        let imgList = [...document.querySelectorAll(".nexus-lazy-load_Kesa")];
-        const io = new IntersectionObserver((entries) => {
-          entries.forEach((entry) => {
-            const el = entry.target;
-            const intersectionRatio = entry.intersectionRatio;
-            if (intersectionRatio > 0 && intersectionRatio <= 1 && !el.classList.contains("preview_Kesa")) {
-              const source = el.dataset.src;
-              el.src = source;
-              el.classList.add("preview_Kesa");
-              if (masonry) {
-                masonry.layout();
-              }
-            }
-            el.onload = el.onerror = () => io.unobserve(el);
-          });
-        });
-        imgList.forEach((img) => io.observe(img));
-      }
-    });
   }
   const CONFIG = {
     torrentListTable: "table.torrents",
@@ -725,100 +634,6 @@
         masonry2.appended(card);
       }
     }
-    NEXUS_TOOLS();
-  }
-  function NEXUS_TOOLS() {
-    jQuery(document).ready(function() {
-      function getImgPosition(e, imgEle2) {
-        let imgWidth = imgEle2.prop("naturalWidth");
-        let imgHeight = imgEle2.prop("naturalHeight");
-        let ratio = imgWidth / imgHeight;
-        let offsetX = 10;
-        let offsetY = 10;
-        let width = window.innerWidth - e.clientX;
-        let height = window.innerHeight - e.clientY;
-        let changeOffsetY = 0;
-        let changeOffsetX = false;
-        if (e.clientX > window.innerWidth / 2 && e.clientX + imgWidth > window.innerWidth) {
-          changeOffsetX = true;
-          width = e.clientX;
-        }
-        if (e.clientY > window.innerHeight / 2) {
-          if (e.clientY + imgHeight / 2 > window.innerHeight) {
-            changeOffsetY = 1;
-            height = e.clientY;
-          } else if (e.clientY + imgHeight > window.innerHeight) {
-            changeOffsetY = 2;
-            height = e.clientY;
-          }
-        }
-        `innerWidth: ${window.innerWidth}, innerHeight: ${window.innerHeight}, pageX: ${e.pageX}, pageY: ${e.pageY}, imgWidth: ${imgWidth}, imgHeight: ${imgHeight}, width: ${width}, height: ${height}, offsetX: ${offsetX}, offsetY: ${offsetY}, changeOffsetX: ${changeOffsetX}, changeOffsetY: ${changeOffsetY}`;
-        if (imgWidth > width) {
-          imgWidth = width;
-          imgHeight = imgWidth / ratio;
-        }
-        if (imgHeight > height) {
-          imgHeight = height;
-          imgWidth = imgHeight * ratio;
-        }
-        if (changeOffsetX) {
-          offsetX = -(e.clientX - width + 10);
-        }
-        if (changeOffsetY == 1) {
-          offsetY = -(imgHeight - (window.innerHeight - e.clientY));
-        } else if (changeOffsetY == 2) {
-          offsetY = -imgHeight / 2;
-        }
-        return { imgWidth, imgHeight, offsetX, offsetY };
-      }
-      function getPosition(e, position) {
-        return {
-          left: e.pageX + position.offsetX,
-          top: e.pageY + position.offsetY,
-          width: position.imgWidth,
-          height: position.imgHeight
-        };
-      }
-      const _previewDom = document.body.appendChild(document.createElement("img"));
-      _previewDom.id = "nexus-preview";
-      const previewEle = jQuery("#nexus-preview");
-      let imgEle;
-      const selector = "img.preview_Kesa";
-      let imgPosition;
-      jQuery("body").on("mouseover", selector, function(e) {
-        imgEle = jQuery(this);
-        imgPosition = getImgPosition(e, imgEle);
-        let position = getPosition(e, imgPosition);
-        let src = imgEle.attr("src");
-        if (src) {
-          previewEle.attr("src", src).css(position).fadeIn("fast");
-        }
-      }).on("mouseout", selector, function(e) {
-        previewEle.hide();
-      }).on("mousemove", selector, function(e) {
-        let position = getPosition(e, imgPosition);
-        previewEle.css(position);
-      });
-      if ("IntersectionObserver" in window) {
-        let imgList = [...document.querySelectorAll(".nexus-lazy-load_Kesa")];
-        const io = new IntersectionObserver((entries) => {
-          entries.forEach((entry) => {
-            const el = entry.target;
-            const intersectionRatio = entry.intersectionRatio;
-            if (intersectionRatio > 0 && intersectionRatio <= 1 && !el.classList.contains("preview_Kesa")) {
-              const source = el.dataset.src;
-              el.src = source;
-              el.classList.add("preview_Kesa");
-              if (masonry) {
-                masonry.layout();
-              }
-            }
-            el.onload = el.onerror = () => io.unobserve(el);
-          });
-        });
-        imgList.forEach((img) => io.observe(img));
-      }
-    });
   }
   const SITE = {
     "kp.m-team.cc": CONFIG,
@@ -893,6 +708,7 @@
     const data = TORRENT_LIST_TO_JSON(torrent_list_Dom);
     console.log(`渲染行数: ${data.length}`);
     RENDER_TORRENT_JSON_IN_MASONRY(waterfallNode, data, isFirst, masonry2);
+    NEXUS_TOOLS();
   }
   function GET_CARD_GUTTER(containerDom, card_width) {
     const _width = containerDom.clientWidth;
@@ -937,6 +753,101 @@
     else
       console.log("本站点无自定义CSS~");
   }
+  function NEXUS_TOOLS() {
+    jQuery(document).ready(function() {
+      function getImgPosition(event, imgEle2) {
+        let imgWidth = imgEle2.prop("naturalWidth");
+        let imgHeight = imgEle2.prop("naturalHeight");
+        let ratio = imgWidth / imgHeight;
+        let offsetX = 0;
+        let offsetY = 0;
+        let width = window.innerWidth - event.clientX;
+        let height = window.innerHeight - event.clientY;
+        let changeOffsetY = 0;
+        let changeOffsetX = false;
+        if (event.clientX > window.innerWidth / 2 && event.clientX + imgWidth > window.innerWidth) {
+          changeOffsetX = true;
+          width = event.clientX;
+        }
+        if (event.clientY > window.innerHeight / 2) {
+          if (event.clientY + imgHeight / 2 > window.innerHeight) {
+            changeOffsetY = 1;
+            height = event.clientY;
+          } else if (event.clientY + imgHeight > window.innerHeight) {
+            changeOffsetY = 2;
+            height = event.clientY;
+          }
+        }
+        if (imgWidth > width) {
+          imgWidth = width;
+          imgHeight = imgWidth / ratio;
+        }
+        if (imgHeight > height) {
+          imgHeight = height;
+          imgWidth = imgHeight * ratio;
+        }
+        if (changeOffsetX) {
+          offsetX = -imgWidth;
+        }
+        if (changeOffsetY == 1) {
+          offsetY = -(imgHeight - (window.innerHeight - event.clientY));
+        } else if (changeOffsetY == 2) {
+          offsetY = -imgHeight / 2;
+        }
+        return { imgWidth, imgHeight, offsetX, offsetY };
+      }
+      function getPosition(event, position) {
+        return {
+          left: event.pageX + position.offsetX,
+          top: event.pageY + position.offsetY,
+          width: position.imgWidth,
+          height: position.imgHeight
+        };
+      }
+      if (!jQuery("#nexus-preview").length) {
+        const _previewDom = document.body.appendChild(document.createElement("img"));
+        _previewDom.id = "nexus-preview";
+      }
+      const previewEle = jQuery("#nexus-preview");
+      let imgEle;
+      const selector = "img.preview_Kesa";
+      let imgPosition;
+      jQuery("body").on("mouseover", selector, function(e) {
+        imgEle = jQuery(this);
+        imgPosition = getImgPosition(e, imgEle);
+        let position = getPosition(e, imgPosition);
+        let src = imgEle.attr("src");
+        if (src) {
+          previewEle.attr("src", src).css(position).fadeIn("fast");
+        }
+      }).on("mouseout", selector, function(e) {
+        previewEle.hide();
+      }).on("mousemove", selector, function(e) {
+        imgPosition = getImgPosition(e, imgEle);
+        let position = getPosition(e, imgPosition);
+        previewEle.css(position);
+      });
+      if ("IntersectionObserver" in window) {
+        let imgList = [...document.querySelectorAll(".nexus-lazy-load_Kesa")];
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            const el = entry.target;
+            const intersectionRatio = entry.intersectionRatio;
+            if (intersectionRatio > 0 && intersectionRatio <= 1 && !el.classList.contains("preview_Kesa")) {
+              const source = el.dataset.src;
+              el.src = source;
+              el.classList.add("preview_Kesa");
+              if (masonry) {
+                masonry.layout();
+              }
+            }
+            el.onload = el.onerror = () => io.unobserve(el);
+          });
+        });
+        imgList.forEach((img) => io.observe(img));
+      }
+    });
+  }
   console.log("________PT-TorrentList-Masonry 已启动!________");
   const _ORIGIN_TL_Node = GET_TORRENT_LIST_DOM_FROM_DOMAIN();
   if (!_ORIGIN_TL_Node) {
@@ -949,9 +860,6 @@
       if (scrollTop + clientHeight >= scrollHeight - PAGE.DISTANCE) {
         if (PAGE.SWITCH_MODE != "Button")
           debounceLoad();
-        else {
-          console.log("按钮模式~");
-        }
         if (masonry2)
           masonry2.layout();
       }
@@ -966,6 +874,12 @@
     const waterfallNode = document.createElement("div");
     waterfallNode.classList.add("waterfall");
     parentNode.insertBefore(waterfallNode, _ORIGIN_TL_Node.nextSibling);
+    waterfallNode.addEventListener("click", () => {
+      if (masonry2) {
+        masonry2.layout();
+        console.log("Masonry 已整理~");
+      }
+    });
     document.getElementById("btnViewOrigin");
     const toggleBtn = document.createElement("button");
     toggleBtn.classList.add("debug");
@@ -1048,6 +962,8 @@ div.waterfall{
 
   /* margin: 0 auto; */
   margin: 20px auto;
+
+  transition: height 0.3s;
 }
 
 /* 调试按键统一样式 */
@@ -1269,6 +1185,8 @@ button#sort_masonry {
   z-index: 20000;
   position: absolute;
   display: none;
+
+  pointer-events: none;
 }
 
 /* 临时标签_热门 */
