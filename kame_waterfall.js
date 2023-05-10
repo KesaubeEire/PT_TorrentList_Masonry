@@ -2,7 +2,7 @@
 // @name            PT种子列表无限下拉瀑布流视图
 // @name:en         PT_waterfall_torrent
 // @namespace       https://github.com/KesaubeEire/PT_TorrentList_Masonry
-// @version         0.4.9
+// @version         0.4.10
 // @author          Kesa
 // @description     PT种子列表无限下拉瀑布流视图(描述不能与名称相同, 乐)
 // @description:en  PT torrent page waterfall view.
@@ -10,6 +10,7 @@
 // @icon            https://kamept.com/favicon.ico
 // @match           https://kamept.com/*
 // @match           https://kp.m-team.cc/*
+// @match           https://pterclub.com/*
 // @exclude         */offers.php*
 // @exclude         */index.php*
 // @exclude         */forums.php*
@@ -21,23 +22,23 @@
 (function () {
   'use strict';
 
-  const CONFIG$1 = {
+  const CONFIG$2 = {
     torrentListTable: "table.torrents",
-    TORRENT_LIST_TO_JSON: TORRENT_LIST_TO_JSON$2,
-    RENDER_TORRENT_JSON_IN_MASONRY: RENDER_TORRENT_JSON_IN_MASONRY$2,
+    TORRENT_LIST_TO_JSON: TORRENT_LIST_TO_JSON$3,
+    RENDER_TORRENT_JSON_IN_MASONRY: RENDER_TORRENT_JSON_IN_MASONRY$3,
     /**如果站点有自定义的icon, 可以用自定义的 */
     ICON: {},
     /**如果站点有必要设置自定义的css, 可以用自定义的 */
-    CSS: css$1,
+    CSS: css$2,
     /**如果站点有必要设置分类颜色, 可以用自定义的 */
     CATEGORY: {}
   };
-  function css$1(variable) {
+  function css$2(variable) {
     return ` 
 
 `;
   }
-  function TORRENT_LIST_TO_JSON$2(torrent_list_Dom, CARD2) {
+  function TORRENT_LIST_TO_JSON$3(torrent_list_Dom, CARD2) {
     const rows = torrent_list_Dom.querySelectorAll("tr");
     const data = [];
     rows.forEach((row) => {
@@ -127,7 +128,7 @@
     });
     return data;
   }
-  function RENDER_TORRENT_JSON_IN_MASONRY$2(waterfallNode, torrent_json, isFirst = true, masonry2, CARD2, ICON2 = CONFIG$1.ICON) {
+  function RENDER_TORRENT_JSON_IN_MASONRY$3(waterfallNode, torrent_json, isFirst = true, masonry2, CARD2, ICON2 = CONFIG$2.ICON) {
     const cardTemplate = (data) => {
       const {
         torrentIndex,
@@ -166,7 +167,7 @@
     class="card-category"
     href="${categoryLink}"
     <!-- TODO: 颜色这里和龟龟商量怎么搞分类的颜色捏 -->    
-    <!-- style="background: ${CONFIG$1.CATEGORY[categoryNumber]};" -->
+    <!-- style="background: ${CONFIG$2.CATEGORY[categoryNumber]};" -->
     >
     <!-- TODO: 图片这里先注释了, 和龟龟商量捏 -->    
     <!-- ${_categoryImg.outerHTML} -->
@@ -281,14 +282,14 @@
       }
     }
   }
-  const CONFIG = {
+  const CONFIG$1 = {
     torrentListTable: "table.torrents",
-    TORRENT_LIST_TO_JSON: TORRENT_LIST_TO_JSON$1,
-    RENDER_TORRENT_JSON_IN_MASONRY: RENDER_TORRENT_JSON_IN_MASONRY$1,
+    TORRENT_LIST_TO_JSON: TORRENT_LIST_TO_JSON$2,
+    RENDER_TORRENT_JSON_IN_MASONRY: RENDER_TORRENT_JSON_IN_MASONRY$2,
     /**如果站点有自定义的icon, 可以用自定义的 */
     ICON: {},
     /**如果站点有必要设置自定义的css, 可以用自定义的 */
-    CSS: css,
+    CSS: css$1,
     /**如果站点有必要设置分类颜色, 可以用自定义的 */
     CATEGORY: {
       // 成人分类
@@ -364,7 +365,7 @@
       // Music 无损
     }
   };
-  function css(variable) {
+  function css$1(variable) {
     return `  
 /* 卡片种类tag */
 .card-category{
@@ -394,7 +395,7 @@
 }
 `;
   }
-  function TORRENT_LIST_TO_JSON$1(torrent_list_Dom, CARD2) {
+  function TORRENT_LIST_TO_JSON$2(torrent_list_Dom, CARD2) {
     const rows = torrent_list_Dom.querySelectorAll("tr");
     const data = [];
     rows.forEach((row) => {
@@ -483,7 +484,7 @@
     });
     return data;
   }
-  function RENDER_TORRENT_JSON_IN_MASONRY$1(waterfallNode, torrent_json, isFirst = true, masonry2, CARD2, ICON2 = CONFIG.ICON) {
+  function RENDER_TORRENT_JSON_IN_MASONRY$2(waterfallNode, torrent_json, isFirst = true, masonry2, CARD2, ICON2 = CONFIG$1.ICON) {
     const cardTemplate = (data) => {
       const {
         torrentIndex,
@@ -522,7 +523,7 @@
   <div
     class="card-category"
     href="${categoryLink}"
-    style="background: ${CONFIG.CATEGORY[categoryNumber]};"
+    style="background: ${CONFIG$1.CATEGORY[categoryNumber]};"
     >
     ${_categoryImg.outerHTML}
     ${category}    
@@ -635,9 +636,326 @@
       }
     }
   }
+  const CONFIG = {
+    torrentListTable: "table.torrents",
+    TORRENT_LIST_TO_JSON: TORRENT_LIST_TO_JSON$1,
+    RENDER_TORRENT_JSON_IN_MASONRY: RENDER_TORRENT_JSON_IN_MASONRY$1,
+    /**如果站点有必要设置分类颜色, 可以用自定义的 */
+    LOADING_IMG: "/pic/PTer.Club_Logo_2023.png",
+    /**如果站点有自定义的icon, 可以用自定义的 */
+    ICON: {},
+    /**如果站点有必要设置自定义的css, 可以用自定义的 */
+    CSS: css,
+    /**如果站点有必要设置分类颜色, 可以用自定义的 */
+    CATEGORY: {
+      // 分类
+      401: "#ca464b",
+      // Movie
+      404: "#ed8f3b",
+      // TV Series
+      403: "#729dbf",
+      // Anime
+      405: "#d97163",
+      // TV Show
+      413: "#a1dae7",
+      // MV
+      406: "#2a4f85",
+      // Music
+      418: "#61281d",
+      // Real Show      
+      402: "#bb3e6e",
+      // 纪录教育
+      407: "#275b5c",
+      // Sport
+      408: "#f6eda2",
+      // EBook
+      409: "#7a5a5e",
+      // Game
+      410: "#e5b2af",
+      // Software
+      411: "#c1aa92",
+      // Learn
+      412: "#c5c6c8"
+      // Other
+    }
+  };
+  function css(variable) {
+    return ` 
+  /* 卡片种类tag */
+  .card-category{
+    height: 24px;
+    padding: 0 6px;
+    border-radius: 20px;
+    border: 1px;
+    background: black;
+    color: white;
+    font-weight: 600;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  
+    display: flex;
+    align-items: center;
+  }
+  
+  /* 卡片种类tag预览图 */
+  .card-category-img
+  {
+    height: 18px;
+  
+    background-size: 100% 141%;
+    background-position: center top;
+    padding-left: 5%;
+  }
+`;
+  }
+  function TORRENT_LIST_TO_JSON$1(torrent_list_Dom, CARD2) {
+    const rows = torrent_list_Dom.querySelectorAll("tbody tr");
+    const data = [];
+    rows.forEach((row) => {
+      const categoryImg = row.querySelector("td:nth-child(1) > a > img");
+      const category = categoryImg ? categoryImg.alt : "";
+      if (!category)
+        return;
+      const DOM_LIST = row.querySelectorAll("td.rowfollow");
+      const categoryLinkDOM = categoryImg.parentNode;
+      const categoryLink = categoryLinkDOM.href;
+      const categoryNumber = categoryLink.slice(-3);
+      const _categoryImg = categoryImg.cloneNode(true);
+      _categoryImg.className = "card-category-img";
+      const torrentIndex = CARD2.CARD_INDEX++;
+      const torrentNameLink = row.querySelector(".torrentname a");
+      const torrentName = torrentNameLink ? torrentNameLink.textContent.trim() : "";
+      const torrentLink = torrentNameLink.href;
+      const pattern = /id=(\d+)/;
+      const match = torrentLink.match(pattern);
+      const torrentId = match ? parseInt(match[1]) : null;
+      const picLink = DOM_LIST[1].querySelector(".torrentname img").getAttribute("data-orig");
+      const desCell = DOM_LIST[1].querySelector(".torrentname td:nth-child(2) > div > div:nth-child(2)");
+      const length = desCell.childNodes.length - 1;
+      const desDom = desCell.childNodes[length];
+      const description = desDom.nodeName == "SPAN" ? desDom.textContent.trim() : "";
+      const place_at_the_top = DOM_LIST[1].querySelectorAll(".torrentname img.sticky");
+      const pattMsg = place_at_the_top[0] ? place_at_the_top[0].title : "";
+      const tempTagDom = DOM_LIST[1].querySelectorAll(".torrentname td:nth-child(2) font");
+      const freeTypeImg = DOM_LIST[1].querySelector('img[class^="pro_"]');
+      const freeType = freeTypeImg ? "_" + freeTypeImg.alt.replace(/\s+/g, "") : "";
+      const freeRemainingTimeSpan = freeType ? DOM_LIST[1].querySelector(".torrentname td:nth-child(2) > div > div:nth-child(1) span") : "";
+      const freeRemainingTime = freeRemainingTimeSpan ? freeRemainingTimeSpan.innerText : "";
+      const tagSpans = DOM_LIST[1].querySelectorAll(".torrentname td:nth-child(2) > div > div:nth-child(2) a");
+      const tagsDOM = Array.from(tagSpans);
+      let tags = tagSpans ? tagsDOM.map((span) => span.textContent.trim()) : [];
+      if (freeRemainingTime != "") {
+        tags.shift();
+        tagsDOM.shift();
+      }
+      const raw_tags = tagsDOM.map((el) => el.outerHTML).join("");
+      const downloadLink = row.querySelector("td:nth-child(5) a").href;
+      const collectLink = `javascript: bookmark(${torrentId},${torrentIndex});`;
+      const collectDOM = row.querySelector(".torrentname a[id^='bookmark']");
+      const collectState = collectDOM.children[0].alt;
+      const commentsLink = DOM_LIST[2];
+      const comments = commentsLink ? parseInt(commentsLink.textContent) : 0;
+      const uploadDateSpan = DOM_LIST[3].childNodes[0];
+      const uploadDate = uploadDateSpan ? uploadDateSpan.title : "";
+      const sizeCell = DOM_LIST[4];
+      const size = sizeCell ? sizeCell.textContent.trim() : "";
+      const seedersLink = DOM_LIST[5];
+      const seeders = seedersLink ? parseInt(seedersLink.textContent) : 0;
+      const leechersCell = DOM_LIST[6];
+      const leechers = leechersCell ? parseInt(leechersCell.textContent) : 0;
+      const snatchedLink = DOM_LIST[7];
+      const snatched = snatchedLink ? parseInt(snatchedLink.textContent) : 0;
+      const rowData = {
+        torrentIndex,
+        _categoryImg,
+        category,
+        categoryLink,
+        categoryNumber,
+        torrent_name: torrentName,
+        torrentLink,
+        torrentId,
+        picLink,
+        place_at_the_top,
+        pattMsg,
+        downloadLink,
+        collectLink,
+        collectState,
+        tempTagDom,
+        freeTypeImg,
+        free_type: freeType,
+        free_remaining_time: freeRemainingTime,
+        raw_tags,
+        tagsDOM,
+        tags,
+        description,
+        upload_date: uploadDate,
+        comments,
+        size,
+        seeders,
+        leechers,
+        snatched
+      };
+      data.push(rowData);
+    });
+    return data;
+  }
+  function RENDER_TORRENT_JSON_IN_MASONRY$1(waterfallNode, torrent_json, isFirst = true, masonry2, CARD2, ICON2 = CONFIG.ICON) {
+    const cardTemplate = (data) => {
+      const {
+        torrentIndex,
+        _categoryImg,
+        category,
+        categoryLink,
+        categoryNumber,
+        torrent_name: torrentName,
+        torrentLink,
+        torrentId,
+        picLink,
+        place_at_the_top,
+        pattMsg,
+        downloadLink,
+        collectLink,
+        collectState,
+        tempTagDom,
+        freeTypeImg,
+        free_type: freeType,
+        free_remaining_time: freeRemainingTime,
+        raw_tags,
+        tagsDOM,
+        tags,
+        description,
+        upload_date: uploadDate,
+        comments,
+        size,
+        seeders,
+        leechers,
+        snatched
+      } = data;
+      return `
+<div class="card-holder">
+  <!-- 分区类别 -->
+  <div
+    class="card-category"
+    href="${categoryLink}"
+    style="background: ${CONFIG.CATEGORY[categoryNumber]};"
+    >
+    <!--${_categoryImg.outerHTML}-->
+    ${category}    
+  </div>
+
+  <!-- 标题 & 跳转详情链接 -->    
+  <div class="card-title">
+    <a class="two-lines" src="${torrentLink}" href="${torrentLink}" target="_blank">
+      ${tempTagDom ? Array.from(tempTagDom).map((e) => e.outerHTML).join("&nbsp;") : ""}
+      <b>${torrentName}</b>
+    </a>
+  </div>
+
+  <!-- 卡片其他信息 -->    
+  <div class="card-body">
+    <div class="card-image" onclick="window.open('${torrentLink}')">
+      <!-- <img class="card-image--img nexus-lazy-load_Kesa" src="pic/misc/spinner.svg" data-src="${picLink}"  alt="${torrentName}" /> -->
+      <!-- NOTE: 加载图片这里换成了logo, 和 MT 一样了捏 -->    
+      <img class="card-image--img nexus-lazy-load_Kesa" src="${CONFIG.LOADING_IMG}" data-src="${picLink}"  alt="${torrentName}" />
+      <div class="card-index">
+        ${torrentIndex + 1}
+      </div>  
+    </div>
+
+    <!-- 置顶 && 免费类型&剩余时间 -->      
+    ${freeType || pattMsg ? `
+      <div class="card-alter">          
+        <div class="top_and_free ${freeType}">
+          <!-- 置顶等级 -->
+          ${place_at_the_top.length != 0 ? Array.from(place_at_the_top).map((e) => e.outerHTML) + "&nbsp;" : ""}
+
+          <!-- 免费类型 & 免费剩余时间 -->
+          ${freeTypeImg ? freeTypeImg.outerHTML : ""}  <b>${freeRemainingTime ? "&nbsp;" + freeRemainingTime : ""}</b>
+        </div>
+      </div>
+          ` : ``}
+
+    <!-- 置顶等级 -->
+    <!--${pattMsg ? `<div><b>置顶等级:</b> ${pattMsg}</div>` : ""}-->
+
+    <!-- 副标题 -->
+    ${description ? `<a class="card-description" href='${torrentLink}'> ${description}</a>` : ""}
+    
+
+    <!-- 标签 Tags -->
+    <div class="cl-tags">
+      ${tagsDOM.map((el) => {
+      const _tag = document.createElement("div");
+      _tag.innerHTML = el.outerHTML;
+      return _tag.outerHTML;
+    }).join("")}
+      <!-- <b>Tags:</b> ${tags.join(", ")} -->
+    </div>
+
+
+    <div class="card-details">  
+      <div class="card-line">
+        <!-- 大小 -->
+        <div class="cl-center">
+          ${ICON2.SIZE}&nbsp;${size}
+        </div> 
+
+        <!-- 下载 -->
+        &nbsp;&nbsp;
+        <div class="cl-center">
+          ${ICON2.DOWNLOAD}&nbsp;
+          <b><a src="${downloadLink}" href="${downloadLink}">下载</a></b>
+        </div>
+
+        <!-- 收藏 -->
+        &nbsp;&nbsp;
+        <div class="cl-center">
+          <div class="btnCollet cl-center" id="tI_${torrentIndex}" onclick='COLLET_AND_ICON_CHANGE("${collectLink}", "tI_${torrentIndex}")'>
+            ${collectState == "Unbookmarked" ? ICON2.COLLET : ICON2.COLLETED}
+            &nbsp;<b>收藏</b>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 种子id, 默认不显示 -->
+      <!--<div class="card-line"><b>Torrent ID:</b> ${torrentId}</div> -->
+      
+      <!-- 上传时间 -->
+      <div class="card-line"><b>上传时间:</b> ${uploadDate}</div>
+      
+      <div class="card-line">
+        ${ICON2.COMMENT}&nbsp;<b>${comments}</b>&nbsp;&nbsp;
+        ${ICON2.SEEDERS}&nbsp;<b>${seeders}</b>&nbsp;&nbsp;
+        ${ICON2.LEECHERS}&nbsp;<b>${leechers}</b>&nbsp;&nbsp;
+        ${ICON2.SNATCHED}&nbsp;<b>${snatched}</b>
+      </div>    
+    </div>
+  </div>
+</div>`;
+    };
+    for (const rowData of torrent_json) {
+      const card = document.createElement("div");
+      card.classList.add("card");
+      card.innerHTML = cardTemplate(rowData);
+      card.style.width = `${CARD2.CARD_WIDTH}px`;
+      card.style.zIndex = 1e4 - rowData.torrentIndex;
+      const card_img = card.querySelector(".card-image--img");
+      card_img.onload = function() {
+        if (masonry2) {
+          masonry2.layout();
+        }
+      };
+      waterfallNode.appendChild(card);
+      if (!isFirst) {
+        masonry2.appended(card);
+      }
+    }
+  }
   const SITE = {
-    "kp.m-team.cc": CONFIG,
-    "kamept.com": CONFIG$1
+    "kp.m-team.cc": CONFIG$1,
+    "kamept.com": CONFIG$2,
+    "pterclub.com": CONFIG
   };
   function GET_CURRENT_PT_DOMAIN() {
     const domainName = window.location.hostname;
@@ -705,7 +1023,9 @@
     );
   }
   function PUT_TORRENT_INTO_MASONRY(torrent_list_Dom, waterfallNode, isFirst = true, masonry2) {
+    console.time("label");
     const data = TORRENT_LIST_TO_JSON(torrent_list_Dom);
+    console.timeEnd("label");
     console.log(`渲染行数: ${data.length}`);
     RENDER_TORRENT_JSON_IN_MASONRY(waterfallNode, data, isFirst, masonry2);
     NEXUS_TOOLS();
@@ -1012,6 +1332,9 @@ button#sort_masonry {
   overflow: hidden;
 
   cursor: pointer;
+
+  box-shadow: rgba(0, 0, 0, 0.3) 3px 3px 0px, rgba(0, 0, 0, 0.1) -1px -1px 0px;
+}
 }
 
 .card:hover {
