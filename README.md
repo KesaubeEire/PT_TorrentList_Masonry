@@ -1,4 +1,4 @@
-# 为 PT站点 打造的种子列表瀑布流视图 (现支持 Kame & MT)
+# 为 PT站点 打造的种子列表瀑布流视图 (现支持 Kame & MT & 猫站)
 
 ![gif_preview.gif](https://github.com/KesaubeEire/PT_TorrentList_Masonry/blob/main/preview/gif_preview.gif?raw=true)
 
