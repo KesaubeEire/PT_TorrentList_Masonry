@@ -2,7 +2,7 @@
 // @name            PT种子列表无限下拉瀑布流视图
 // @name:en         PT_waterfall_torrent
 // @namespace       https://github.com/KesaubeEire/PT_TorrentList_Masonry
-// @version         0.4.10
+// @version         0.4.12
 // @author          Kesa
 // @description     PT种子列表无限下拉瀑布流视图(描述不能与名称相同, 乐)
 // @description:en  PT torrent page waterfall view.
@@ -22,6 +22,43 @@
 (function () {
   'use strict';
 
+  function debounce(func, delay) {
+    var timer;
+    return function() {
+      var context = this;
+      var args = arguments;
+      clearTimeout(timer);
+      timer = setTimeout(function() {
+        func.apply(context, args);
+      }, delay);
+    };
+  }
+  function throttle(func, delay) {
+    let timerId;
+    let lastExecTime = 0;
+    return function(...args) {
+      const currentTime = Date.now();
+      const elapsedTime = currentTime - lastExecTime;
+      if (!timerId && elapsedTime > delay) {
+        func.apply(this, args);
+        lastExecTime = currentTime;
+      } else {
+        clearTimeout(timerId);
+        timerId = setTimeout(() => {
+          func.apply(this, args);
+          lastExecTime = currentTime;
+          timerId = null;
+        }, delay - elapsedTime);
+      }
+    };
+  }
+  function sortMasonry() {
+    if (masonry) {
+      throttle(function sort_masonry() {
+        masonry.layout();
+      }, 1500)();
+    }
+  }
   const CONFIG$2 = {
     torrentListTable: "table.torrents",
     TORRENT_LIST_TO_JSON: TORRENT_LIST_TO_JSON$3,
@@ -39,7 +76,7 @@
 `;
   }
   function TORRENT_LIST_TO_JSON$3(torrent_list_Dom, CARD2) {
-    const rows = torrent_list_Dom.querySelectorAll("tr");
+    const rows = torrent_list_Dom.querySelectorAll("tbody tr");
     const data = [];
     rows.forEach((row) => {
       const categoryImg = row.querySelector("td:nth-child(1) > a > img");
@@ -273,9 +310,30 @@
       const card_img = card.querySelector(".card-image--img");
       card_img.onload = function() {
         if (masonry2) {
-          masonry2.layout();
+          sortMasonry();
         }
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach((mutation) => {
+            if (mutation.type === "attributes" && mutation.attributeName === "src") {
+              if (masonry2) {
+                sortMasonry();
+              }
+            }
+          });
+        });
+        const config = {
+          attributes: true,
+          // 监听属性变化
+          attributeFilter: ["src"]
+          // 只监听 src 属性的变化
+        };
+        observer.observe(card_img, config);
       };
+      card_img.addEventListener("load", () => {
+        if (masonry2) {
+          sortMasonry();
+        }
+      });
       waterfallNode.appendChild(card);
       if (!isFirst) {
         masonry2.appended(card);
@@ -396,7 +454,7 @@
 `;
   }
   function TORRENT_LIST_TO_JSON$2(torrent_list_Dom, CARD2) {
-    const rows = torrent_list_Dom.querySelectorAll("tr");
+    const rows = torrent_list_Dom.querySelectorAll("tbody tr");
     const data = [];
     rows.forEach((row) => {
       const categoryImg = row.querySelector("td:nth-child(1) > a > img");
@@ -627,9 +685,30 @@
       const card_img = card.querySelector(".card-image--img");
       card_img.onload = function() {
         if (masonry2) {
-          masonry2.layout();
+          sortMasonry();
         }
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach((mutation) => {
+            if (mutation.type === "attributes" && mutation.attributeName === "src") {
+              if (masonry2) {
+                sortMasonry();
+              }
+            }
+          });
+        });
+        const config = {
+          attributes: true,
+          // 监听属性变化
+          attributeFilter: ["src"]
+          // 只监听 src 属性的变化
+        };
+        observer.observe(card_img, config);
       };
+      card_img.addEventListener("load", () => {
+        if (masonry2) {
+          sortMasonry();
+        }
+      });
       waterfallNode.appendChild(card);
       if (!isFirst) {
         masonry2.appended(card);
@@ -732,9 +811,9 @@
       const torrentId = match ? parseInt(match[1]) : null;
       const picLink = DOM_LIST[1].querySelector(".torrentname img").getAttribute("data-orig");
       const desCell = DOM_LIST[1].querySelector(".torrentname td:nth-child(2) > div > div:nth-child(2)");
-      const length = desCell.childNodes.length - 1;
-      const desDom = desCell.childNodes[length];
-      const description = desDom.nodeName == "SPAN" ? desDom.textContent.trim() : "";
+      const length = desCell ? desCell.childNodes.length - 1 : null;
+      const desDom = desCell ? desCell.childNodes[length] : null;
+      const description = desCell ? desDom.nodeName == "SPAN" ? desDom.textContent.trim() : "" : null;
       const place_at_the_top = DOM_LIST[1].querySelectorAll(".torrentname img.sticky");
       const pattMsg = place_at_the_top[0] ? place_at_the_top[0].title : "";
       const tempTagDom = DOM_LIST[1].querySelectorAll(".torrentname td:nth-child(2) font");
@@ -943,9 +1022,30 @@
       const card_img = card.querySelector(".card-image--img");
       card_img.onload = function() {
         if (masonry2) {
-          masonry2.layout();
+          sortMasonry();
         }
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach((mutation) => {
+            if (mutation.type === "attributes" && mutation.attributeName === "src") {
+              if (masonry2) {
+                sortMasonry();
+              }
+            }
+          });
+        });
+        const config = {
+          attributes: true,
+          // 监听属性变化
+          attributeFilter: ["src"]
+          // 只监听 src 属性的变化
+        };
+        observer.observe(card_img, config);
       };
+      card_img.addEventListener("load", () => {
+        if (masonry2) {
+          sortMasonry();
+        }
+      });
       waterfallNode.appendChild(card);
       if (!isFirst) {
         masonry2.appended(card);
@@ -1023,9 +1123,7 @@
     );
   }
   function PUT_TORRENT_INTO_MASONRY(torrent_list_Dom, waterfallNode, isFirst = true, masonry2) {
-    console.time("label");
     const data = TORRENT_LIST_TO_JSON(torrent_list_Dom);
-    console.timeEnd("label");
     console.log(`渲染行数: ${data.length}`);
     RENDER_TORRENT_JSON_IN_MASONRY(waterfallNode, data, isFirst, masonry2);
     NEXUS_TOOLS();
@@ -1042,7 +1140,7 @@
       card.style.width = `${targetWidth}px`;
     }
     masonry2.options.gutter = GET_CARD_GUTTER(containerDom, targetWidth);
-    masonry2.layout();
+    sortMasonry();
   }
   function COLLET_AND_ICON_CHANGE(jsCodeLink, card_id) {
     try {
@@ -1056,17 +1154,6 @@
     }
   }
   window.COLLET_AND_ICON_CHANGE = COLLET_AND_ICON_CHANGE;
-  function debounce(func, delay) {
-    var timer;
-    return function() {
-      var context = this;
-      var args = arguments;
-      clearTimeout(timer);
-      timer = setTimeout(function() {
-        func.apply(context, args);
-      }, delay);
-    };
-  }
   function ADD_SITE_EXCLUSIVE_CSS() {
     if (SITE[SITE_DOMAIN].CSS)
       return SITE[SITE_DOMAIN].CSS();
@@ -1152,16 +1239,16 @@
         const io = new IntersectionObserver((entries) => {
           entries.forEach((entry) => {
             const el = entry.target;
-            const intersectionRatio = entry.intersectionRatio;
-            if (intersectionRatio > 0 && intersectionRatio <= 1 && !el.classList.contains("preview_Kesa")) {
+            entry.intersectionRatio;
+            el._entry = entry;
+            if (entry.isIntersecting && !el.classList.contains("preview_Kesa")) {
               const source = el.dataset.src;
               el.src = source;
               el.classList.add("preview_Kesa");
               if (masonry) {
-                masonry.layout();
+                sortMasonry();
               }
             }
-            el.onload = el.onerror = () => io.unobserve(el);
           });
         });
         imgList.forEach((img) => io.observe(img));
@@ -1181,8 +1268,36 @@
         if (PAGE.SWITCH_MODE != "Button")
           debounceLoad();
         if (masonry2)
-          masonry2.layout();
+          sortMasonry();
       }
+    }, loadNextPage = function() {
+      console.log("到页面底部啦!!! Scrolled to bottom!");
+      const urlSearchParams = new URLSearchParams(window.location.search);
+      PAGE.PAGE_CURRENT = PAGE.IS_ORIGIN ? urlSearchParams.get("page") : PAGE.PAGE_CURRENT;
+      if (!PAGE.PAGE_CURRENT) {
+        console.log(`网页链接没有page参数, 无法跳转下一页, 生成PAGE.PAGE_CURRENT为0`);
+        PAGE.PAGE_CURRENT = 0;
+      } else {
+        console.log("当前页数: " + PAGE.PAGE_CURRENT);
+      }
+      PAGE.PAGE_NEXT = parseInt(PAGE.PAGE_CURRENT) + 1;
+      urlSearchParams.set("page", PAGE.PAGE_NEXT);
+      PAGE.NEXT_URL = window.location.origin + window.location.pathname + "?" + urlSearchParams.toString();
+      console.log("New URL:", PAGE.NEXT_URL);
+      fetch(PAGE.NEXT_URL).then((response) => response.text()).then((html) => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
+        const table = doc.querySelector("table.torrents");
+        PUT_TORRENT_INTO_MASONRY(table, waterfallNode, false, masonry2);
+        CHANGE_CARD_WIDTH(CARD.CARD_WIDTH, waterfallNode, masonry2);
+        PAGE.IS_ORIGIN = false;
+        PAGE.PAGE_CURRENT = PAGE.PAGE_NEXT;
+      }).catch((error) => {
+        console.warn("获取不到下页信息, 可能到头了");
+        console.warn(error);
+      });
+      btnTurnPageDOM.disabled = false;
+      btnTurnPageDOM.textContent = "点击加载下一页";
     };
     let masonry2;
     window.masonry = masonry2;
@@ -1196,7 +1311,7 @@
     parentNode.insertBefore(waterfallNode, _ORIGIN_TL_Node.nextSibling);
     waterfallNode.addEventListener("click", () => {
       if (masonry2) {
-        masonry2.layout();
+        sortMasonry();
         console.log("Masonry 已整理~");
       }
     });
@@ -1224,11 +1339,11 @@
     reLayoutBtn.style.zIndex = 10002;
     reLayoutBtn.addEventListener("click", function() {
       if (masonry2) {
-        masonry2.layout();
+        sortMasonry();
       }
       CARD.CARD_WIDTH = CARD.CARD_WIDTH == 200 ? 300 : 200;
       CHANGE_CARD_WIDTH(CARD.CARD_WIDTH, waterfallNode, masonry2);
-      masonry2.layout();
+      sortMasonry();
     });
     document.body.appendChild(reLayoutBtn);
     const btnTurnPageDOM = document.createElement("button");
@@ -1238,6 +1353,8 @@
     btnTurnPageDOM.innerText = "点击加载下一页";
     btnTurnPageDOM.addEventListener("click", function(event) {
       event.preventDefault();
+      btnTurnPageDOM.disabled = true;
+      btnTurnPageDOM.textContent = "正在加载中...";
       debounceLoad();
     });
     document.getElementById("btnSwitchMode");
@@ -1266,7 +1383,7 @@
     sortMasonryBtn.style.zIndex = 10004;
     sortMasonryBtn.addEventListener("click", function() {
       if (masonry2)
-        masonry2.layout();
+        sortMasonry();
     });
     document.body.appendChild(sortMasonryBtn);
     PUT_TORRENT_INTO_MASONRY(_ORIGIN_TL_Node, waterfallNode, true, masonry2);
@@ -1541,42 +1658,16 @@ button#sort_masonry {
       });
       window.addEventListener("resize", function() {
         masonry2.options.gutter = GET_CARD_GUTTER(waterfallNode, CARD.CARD_WIDTH);
-        masonry2.layout();
+        sortMasonry();
       });
-      masonry2.layout();
+      sortMasonry();
       window.masonry = masonry2;
     };
     let debounceLoad;
     window.addEventListener("scroll", function() {
       scan_and_launch();
     });
-    debounceLoad = debounce(function() {
-      console.log("到页面底部啦!!! Scrolled to bottom!");
-      const urlSearchParams = new URLSearchParams(window.location.search);
-      PAGE.PAGE_CURRENT = PAGE.IS_ORIGIN ? urlSearchParams.get("page") : PAGE.PAGE_CURRENT;
-      if (!PAGE.PAGE_CURRENT) {
-        console.log(`网页链接没有page参数, 无法跳转下一页, 生成PAGE.PAGE_CURRENT为0`);
-        PAGE.PAGE_CURRENT = 0;
-      } else {
-        console.log("当前页数: " + PAGE.PAGE_CURRENT);
-      }
-      PAGE.PAGE_NEXT = parseInt(PAGE.PAGE_CURRENT) + 1;
-      urlSearchParams.set("page", PAGE.PAGE_NEXT);
-      PAGE.NEXT_URL = window.location.origin + window.location.pathname + "?" + urlSearchParams.toString();
-      console.log("New URL:", PAGE.NEXT_URL);
-      fetch(PAGE.NEXT_URL).then((response) => response.text()).then((html) => {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, "text/html");
-        const table = doc.querySelector("table.torrents");
-        PUT_TORRENT_INTO_MASONRY(table, waterfallNode, false, masonry2);
-        CHANGE_CARD_WIDTH(CARD.CARD_WIDTH, waterfallNode, masonry2);
-        PAGE.IS_ORIGIN = false;
-        PAGE.PAGE_CURRENT = PAGE.PAGE_NEXT;
-      }).catch((error) => {
-        console.warn("获取不到下页信息, 可能到头了");
-        console.warn(error);
-      });
-    }, PAGE.DISTANCE);
+    debounceLoad = debounce(loadNextPage, PAGE.GAP);
   }
 
 })();

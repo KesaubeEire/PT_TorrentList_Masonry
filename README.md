@@ -45,7 +45,8 @@ RT, 本油猴脚本(目前)专为 PT 打造, 让你顺畅划划划, 一页爽逛
 - 功能列表
 
   - [x] 懒加载(from tg by @兔纸)
-      - TODO: [ ] 懒加载完成后新图片出来之际整理瀑布流
+      - [x] 懒加载完成后新图片出来之际整理瀑布流
+      - [x] 修复了一些小的懒加载不出图的小 bug
   - [x] 触摸图片预览原图(from tg by @兔纸)
       - [x] 修正右边图片的预览位置
          - [x] <s>抄[某pixiv油猴脚本](https://github.com/Ocrosoft/PixivPreviewer)的实现(from tg by @兔纸)</s> 失败了, 有点复杂
