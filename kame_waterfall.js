@@ -2,7 +2,7 @@
 // @name            PT种子列表无限下拉瀑布流视图
 // @name:en         PT_waterfall_torrent
 // @namespace       https://github.com/KesaubeEire/PT_TorrentList_Masonry
-// @version         0.4.14.1
+// @version         0.4.15
 // @author          Kesa
 // @description     PT种子列表无限下拉瀑布流视图(描述不能与名称相同, 乐)
 // @description:en  PT torrent page waterfall view.
@@ -22,14 +22,18 @@
 (function () {
   'use strict';
 
+  const _COUNT = {
+    // 外部呼叫函数次数
+    Call: 0,
+    // 函数实际执行次数
+    Run: 0
+  };
   function debounce(func, delay) {
-    var timer;
+    let timer;
     return function() {
-      var context = this;
-      var args = arguments;
       clearTimeout(timer);
       timer = setTimeout(function() {
-        func.apply(context, args);
+        func.apply(this, arguments);
       }, delay);
     };
   }
@@ -52,11 +56,16 @@
       }
     };
   }
+  const throttleSort = throttle(doSortMasonry, 1500);
+  function doSortMasonry() {
+    _COUNT.Run++;
+    console.log(`呼叫整理次数: ${_COUNT.Call}   实际整理次数: ${_COUNT.Run}`);
+    masonry.layout();
+  }
   function sortMasonry() {
+    _COUNT.Call++;
     if (masonry) {
-      throttle(function sort_masonry() {
-        masonry.layout();
-      }, 1500)();
+      throttleSort();
     }
   }
   const CONFIG$2 = {
@@ -2772,7 +2781,8 @@
     waterfallNode.classList.add("waterfall");
     parentNode.insertBefore(waterfallNode, _ORIGIN_TL_Node.nextSibling);
     waterfallNode.addEventListener("click", () => {
-      sortMasonry();
+      if (masonry2)
+        masonry2.layout();
       console.log("Masonry 已整理~");
     });
     document.getElementById("btnViewOrigin");
@@ -2840,7 +2850,8 @@
     sortMasonryBtn.innerText = "手动整理布局";
     sortMasonryBtn.style.zIndex = 10004;
     sortMasonryBtn.addEventListener("click", function() {
-      sortMasonry();
+      if (masonry2)
+        masonry2.layout();
     });
     document.body.appendChild(sortMasonryBtn);
     PUT_TORRENT_INTO_MASONRY(_ORIGIN_TL_Node, waterfallNode, true, masonry2);
