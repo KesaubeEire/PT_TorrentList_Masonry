@@ -309,15 +309,11 @@
       card.style.zIndex = 1e4 - rowData.torrentIndex;
       const card_img = card.querySelector(".card-image--img");
       card_img.onload = function() {
-        if (masonry2) {
-          sortMasonry();
-        }
+        sortMasonry();
         const observer = new MutationObserver((mutations) => {
           mutations.forEach((mutation) => {
             if (mutation.type === "attributes" && mutation.attributeName === "src") {
-              if (masonry2) {
-                sortMasonry();
-              }
+              sortMasonry();
             }
           });
         });
@@ -330,9 +326,7 @@
         observer.observe(card_img, config);
       };
       card_img.addEventListener("load", () => {
-        if (masonry2) {
-          sortMasonry();
-        }
+        sortMasonry();
       });
       waterfallNode.appendChild(card);
       if (!isFirst) {
@@ -683,15 +677,11 @@
       card.style.zIndex = 1e4 - rowData.torrentIndex;
       const card_img = card.querySelector(".card-image--img");
       card_img.onload = function() {
-        if (masonry2) {
-          sortMasonry();
-        }
+        sortMasonry();
         const observer = new MutationObserver((mutations) => {
           mutations.forEach((mutation) => {
             if (mutation.type === "attributes" && mutation.attributeName === "src") {
-              if (masonry2) {
-                sortMasonry();
-              }
+              sortMasonry();
             }
           });
         });
@@ -704,9 +694,7 @@
         observer.observe(card_img, config);
       };
       card_img.addEventListener("load", () => {
-        if (masonry2) {
-          sortMasonry();
-        }
+        sortMasonry();
       });
       waterfallNode.appendChild(card);
       if (!isFirst) {
@@ -1019,15 +1007,11 @@
       card.style.zIndex = 1e4 - rowData.torrentIndex;
       const card_img = card.querySelector(".card-image--img");
       card_img.onload = function() {
-        if (masonry2) {
-          sortMasonry();
-        }
+        sortMasonry();
         const observer = new MutationObserver((mutations) => {
           mutations.forEach((mutation) => {
             if (mutation.type === "attributes" && mutation.attributeName === "src") {
-              if (masonry2) {
-                sortMasonry();
-              }
+              sortMasonry();
             }
           });
         });
@@ -1040,9 +1024,7 @@
         observer.observe(card_img, config);
       };
       card_img.addEventListener("load", () => {
-        if (masonry2) {
-          sortMasonry();
-        }
+        sortMasonry();
       });
       waterfallNode.appendChild(card);
       if (!isFirst) {
@@ -1243,9 +1225,7 @@
               const source = el.dataset.src;
               el.src = source;
               el.classList.add("preview_Kesa");
-              if (masonry) {
-                sortMasonry();
-              }
+              sortMasonry();
             }
           });
         });
@@ -2747,8 +2727,7 @@
       if (scrollTop + clientHeight >= scrollHeight - PAGE.DISTANCE) {
         if (PAGE.SWITCH_MODE != "Button")
           debounceLoad();
-        if (masonry2)
-          sortMasonry();
+        sortMasonry();
       }
     }, loadNextPage = function() {
       console.log("到页面底部啦!!! Scrolled to bottom!");
@@ -2779,21 +2758,22 @@
       btnTurnPageDOM.disabled = false;
       btnTurnPageDOM.textContent = "点击加载下一页";
     };
+    _ORIGIN_TL_Node.style.display = "none";
+    while (!Masonry) {
+      console.log("等待初始化......");
+    }
     let masonry2;
     window.masonry = masonry2;
     const mainOuterDOM = document.querySelector("table.mainouter");
     const themeColor = window.getComputedStyle(mainOuterDOM)["background-color"];
     console.log("背景颜色:", themeColor);
     const parentNode = _ORIGIN_TL_Node.parentNode;
-    _ORIGIN_TL_Node.style.display = "none";
     const waterfallNode = document.createElement("div");
     waterfallNode.classList.add("waterfall");
     parentNode.insertBefore(waterfallNode, _ORIGIN_TL_Node.nextSibling);
     waterfallNode.addEventListener("click", () => {
-      if (masonry2) {
-        sortMasonry();
-        console.log("Masonry 已整理~");
-      }
+      sortMasonry();
+      console.log("Masonry 已整理~");
     });
     document.getElementById("btnViewOrigin");
     const toggleBtn = document.createElement("button");
@@ -2818,9 +2798,7 @@
     reLayoutBtn.innerText = "单列宽度切换(200/300)";
     reLayoutBtn.style.zIndex = 10002;
     reLayoutBtn.addEventListener("click", function() {
-      if (masonry2) {
-        sortMasonry();
-      }
+      sortMasonry();
       CARD.CARD_WIDTH = CARD.CARD_WIDTH == 200 ? 300 : 200;
       CHANGE_CARD_WIDTH(CARD.CARD_WIDTH, waterfallNode, masonry2);
       sortMasonry();
@@ -2862,8 +2840,7 @@
     sortMasonryBtn.innerText = "手动整理布局";
     sortMasonryBtn.style.zIndex = 10004;
     sortMasonryBtn.addEventListener("click", function() {
-      if (masonry2)
-        sortMasonry();
+      sortMasonry();
     });
     document.body.appendChild(sortMasonryBtn);
     PUT_TORRENT_INTO_MASONRY(_ORIGIN_TL_Node, waterfallNode, true, masonry2);
