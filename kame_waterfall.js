@@ -2,7 +2,7 @@
 // @name            PT种子列表无限下拉瀑布流视图
 // @name:en         PT_waterfall_torrent
 // @namespace       https://github.com/KesaubeEire/PT_TorrentList_Masonry
-// @version         0.4.15
+// @version         0.4.16
 // @author          Kesa
 // @description     PT种子列表无限下拉瀑布流视图(描述不能与名称相同, 乐)
 // @description:en  PT torrent page waterfall view.
@@ -1192,6 +1192,88 @@
         }
         return { imgWidth, imgHeight, offsetX, offsetY };
       }
+      function getMinRatio(pic, container) {
+        return Math.min(container.width / pic.width, container.height / pic.height);
+      }
+      function previewPosition_Kesa(event, imgEle2) {
+        let imgWidth = imgEle2.prop("naturalWidth") ?? 0;
+        let imgHeight = imgEle2.prop("naturalHeight") ?? 0;
+        const mouseX = event.clientX;
+        const mouseY = event.clientY;
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        const distanceToTop = mouseY;
+        const distanceToBottom = viewportHeight - mouseY;
+        const distanceToLeft = mouseX;
+        const distanceToRight = viewportWidth - mouseX;
+        const picSize = {
+          width: imgWidth,
+          height: imgHeight
+        };
+        const containerSize = {
+          bot: {
+            width: viewportWidth,
+            height: distanceToBottom
+          },
+          top: {
+            width: viewportWidth,
+            height: distanceToTop
+          },
+          right: {
+            width: distanceToRight,
+            height: viewportHeight
+          },
+          left: {
+            width: distanceToLeft,
+            height: viewportHeight
+          }
+        };
+        let maxRatio = 0;
+        let maxPosition = "";
+        for (const key in containerSize) {
+          if (Object.hasOwnProperty.call(containerSize, key)) {
+            const element = containerSize[key];
+            if (getMinRatio(picSize, element) > maxRatio) {
+              maxRatio = getMinRatio(picSize, element);
+              maxPosition = key;
+            }
+          }
+        }
+        const result = {
+          top: {
+            left: 0,
+            top: 0,
+            width: viewportWidth,
+            height: distanceToTop
+          },
+          bot: {
+            left: 0,
+            top: distanceToTop,
+            width: viewportWidth,
+            height: distanceToBottom
+          },
+          left: {
+            left: 0,
+            top: 0,
+            width: distanceToLeft,
+            height: viewportHeight
+          },
+          right: {
+            left: distanceToLeft,
+            top: 0,
+            width: distanceToRight,
+            height: viewportHeight
+          },
+          default: {
+            left: 0,
+            top: 0,
+            width: 0,
+            height: 0
+          }
+        };
+        const container = maxPosition != "" ? result[maxPosition] : result["default"];
+        return container;
+      }
       function getPosition(event, position) {
         return {
           left: event.pageX + position.offsetX,
@@ -1200,28 +1282,69 @@
           height: position.imgHeight
         };
       }
+      const selector = "img.preview_Kesa";
+      let imgEle;
+      let imgPosition;
       if (!jQuery("#nexus-preview").length) {
         const _previewDom = document.body.appendChild(document.createElement("img"));
         _previewDom.id = "nexus-preview";
       }
-      const previewEle = jQuery("#nexus-preview");
-      let imgEle;
-      const selector = "img.preview_Kesa";
-      let imgPosition;
+      jQuery("#nexus-preview");
+      function createKesaPreview(color) {
+        const parent = jQuery("<div>", {
+          id: "kp_container",
+          css: {
+            backgroundColor: color,
+            opacity: 1,
+            position: "fixed",
+            zIndex: 2e4,
+            pointerEvents: "none",
+            transition: "all .3s"
+          }
+        });
+        parent.append(jQuery("<img>", {
+          class: "kp_img",
+          css: {
+            position: "absolute",
+            zIndex: 20002,
+            pointerEvents: "none",
+            width: "100%",
+            height: "100%",
+            objectFit: "contain"
+          }
+        }));
+        parent.append(jQuery("<img>", {
+          class: "kp_img",
+          css: {
+            position: "absolute",
+            zIndex: 20001,
+            pointerEvents: "none",
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            filter: `blur(8px)`
+          }
+        }));
+        return parent;
+      }
+      const kesa_preview = jQuery("#kp_container").length > 0 ? jQuery("#kp_container") : createKesaPreview("");
+      jQuery("body").append(kesa_preview);
       jQuery("body").on("mouseover", selector, function(e) {
         imgEle = jQuery(this);
         imgPosition = getImgPosition(e, imgEle);
-        let position = getPosition(e, imgPosition);
+        getPosition(e, imgPosition);
         let src = imgEle.attr("src");
         if (src) {
-          previewEle.attr("src", src).css(position).fadeIn("fast");
+          if (kesa_preview)
+            kesa_preview.find(".kp_img").attr("src", src);
         }
+        kesa_preview.css(previewPosition_Kesa(e, imgEle)).show();
       }).on("mouseout", selector, function(e) {
-        previewEle.hide();
+        kesa_preview.hide();
       }).on("mousemove", selector, function(e) {
         imgPosition = getImgPosition(e, imgEle);
-        let position = getPosition(e, imgPosition);
-        previewEle.css(position);
+        getPosition(e, imgPosition);
+        kesa_preview.css(previewPosition_Kesa(e, imgEle));
       });
       if ("IntersectionObserver" in window) {
         let imgList = [...document.querySelectorAll(".nexus-lazy-load_Kesa")];
