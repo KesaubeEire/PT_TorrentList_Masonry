@@ -1,3 +1,13 @@
+# 本脚本已经重构
+
+详细地址:  
+[**新版 github 项目地址~**](https://github.com/KesaubeEire/PT_Masonry_View_Svelte)  
+[**新版油猴项目地址~**](https://greasyfork.org/zh-CN/scripts/470821)  
+
+<details>
+    <summary><s>原始简介</s></summary>
+
+
 # 为 PT站点 打造的种子列表瀑布流视图 (现支持 Kame & MT & 猫站)
 
 ![gif_preview.gif](https://github.com/KesaubeEire/PT_TorrentList_Masonry/blob/main/preview/gif_preview.gif?raw=true)
@@ -53,6 +63,7 @@ RT, 本油猴脚本(目前)专为 PT 打造, 让你顺畅划划划, 一页爽逛
          - [x] <s>抄[某pixiv油猴脚本](https://github.com/Ocrosoft/PixivPreviewer)的实现(from tg by @兔纸)</s> 失败了, 有点复杂
          - [x] 自己改了改, 基本修正了
          - [x] NOTE: 更好的四空间(四叉树)改造法基本完成, 等待大家反馈意见
+            - [ ] TODO: 做一个切换显示方式(尽量原图&最大显示)的切换变化, panel 完成后搞
   - [x] 默认将自动翻页改为按键翻页(from tg by @兔纸)
       - [x] <s>抄 NGA 的方式下拉到底后触点下一页(from tg by @兔纸)</s> 不太好用捏
   - [x] 瀑布流基础排版
@@ -121,4 +132,5 @@ RT, 本油猴脚本(目前)专为 PT 打造, 让你顺畅划划划, 一页爽逛
 <details>
     <summary><s>记录一些小小的暴论(嘻嘻本人不要打我)</s></summary>
     <p>1. 违反用户直觉的都是垃圾程序 by兔纸(2023/05/08 18:39)</p>
+</details>
 </details>
